@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserApiController {
     private final UserService userService;
 
-    @PostMapping("/user")
-    public ResponseEntity signup(@RequestBody AddUserRequest request) {
+    @PostMapping("/signup")
+    public ResponseEntity<AddUserResponse> signup(@RequestBody AddUserRequest request) {
         User user = userService.save(request); // 회원가입 메서드 호출
 
         return ResponseEntity.status(HttpStatus.CREATED)

@@ -11,6 +11,9 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import io.potatoy.syiary.config.jwt.TokenProvider;
 
 import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 
@@ -19,6 +22,8 @@ import static org.springframework.boot.autoconfigure.security.servlet.PathReques
 @Configuration
 @RequiredArgsConstructor
 public class WebSecurityConfig {
+
+    private final TokenProvider tokenProvider;
 
     // 스프링 시큐리티 기능 비활성화
     @Bean
@@ -36,12 +41,21 @@ public class WebSecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
 
+                // JWT 사용을 위해 세션 사용 비활성화
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
+                // 헤더를 확인하는 커스텀 필터 추가
+                .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/", "/login", "/signup").permitAll()
-                        .requestMatchers("/api/user", "/api/login").permitAll()
-                        .anyRequest().authenticated())
+                        // 로그인, 회원가입, 토큰 갱신을 제외한 api는 인증을 하도록 설정
+                        .requestMatchers(
+                                "/api/authenticate",
+                                "/api/signup",
+                                "/api/token")
+                        .permitAll()
+                        .requestMatchers("/api/**").authenticated()
+                        .anyRequest().permitAll())
                 .build();
     }
 
@@ -49,5 +63,10 @@ public class WebSecurityConfig {
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public TokenAuthenticationFilter tokenAuthenticationFilter() {
+        return new TokenAuthenticationFilter(tokenProvider);
     }
 }
