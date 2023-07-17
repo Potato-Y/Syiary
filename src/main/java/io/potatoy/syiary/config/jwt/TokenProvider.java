@@ -93,6 +93,17 @@ public class TokenProvider {
                 authorities);
     }
 
+    /**
+     * 토큰 기반으로 유저 ID를 가져오는 메서드
+     * 
+     * @param token
+     * @return
+     */
+    public Long getUserId(String token) {
+        Claims claims = getClaims(token);
+        return claims.get("id", Long.class);
+    }
+
     private Claims getClaims(String token) {
         return Jwts.parser() // 클레임 조회
                 .setSigningKey(jwtProperties.getSecretKey())
