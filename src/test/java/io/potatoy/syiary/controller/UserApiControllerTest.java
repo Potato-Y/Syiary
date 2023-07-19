@@ -28,7 +28,7 @@ class UserApiControllerTest {
     @Test
     public void addUser() throws Exception {
         // given 새로운 유저 추가에 필요한 객체를 생성
-        final String url = "/api/user";
+        final String url = "/api/signup";
         final String email = "test@mail.com";
         final String password = "test";
         final AddUserRequest addUserRequest = new AddUserRequest(email, password);
