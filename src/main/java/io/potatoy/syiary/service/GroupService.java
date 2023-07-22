@@ -8,10 +8,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import io.potatoy.syiary.domain.Group;
+import io.potatoy.syiary.domain.GroupMember;
 import io.potatoy.syiary.domain.User;
 import io.potatoy.syiary.domain.enums.State;
 import io.potatoy.syiary.dto.group.CreateGroupRequest;
 import io.potatoy.syiary.dto.group.CreateGroupResponse;
+import io.potatoy.syiary.repository.GroupMemberRepository;
 import io.potatoy.syiary.repository.GroupRepository;
 import io.potatoy.syiary.repository.UserRepository;
 import io.potatoy.syiary.util.GroupIDMaker;
@@ -22,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class GroupService {
 
     private final GroupRepository groupRepository;
+    private final GroupMemberRepository groupMemberRepository;
     private final UserRepository userRepository;
 
     /**
@@ -35,6 +38,7 @@ public class GroupService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Optional<User> user = userRepository.findByEmail(userDetails.getUsername());
+        Long userId = user.get().getId();
 
         GroupIDMaker groupIDMaker = new GroupIDMaker();
         String groupID;
@@ -57,8 +61,14 @@ public class GroupService {
                 Group.builder()
                         .groupId(groupID)
                         .groupName(dto.getGroupName())
-                        .hostId(user.get().getId())
+                        .hostId(userId)
                         .state(State.ACTIVE)
+                        .build());
+        // group member에 만든 본인 추가
+        groupMemberRepository.save(
+                GroupMember.builder()
+                        .userId(userId)
+                        .group(group)
                         .build());
 
         return new CreateGroupResponse(group.getId(), group.getGroupId(), group.getGroupName());

@@ -22,14 +22,14 @@ public class GroupController {
 
     private final GroupService groupService;
 
-    @PostMapping("/group") // 그룹 생성
+    @PostMapping("/groups") // 그룹 생성
     public ResponseEntity<CreateGroupResponse> groupCreate(@Validated @RequestBody CreateGroupRequest request) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(groupService.createGroup(request));
     }
 
-    // @DeleteMapping("/group") // 그룹 삭제
+    // @DeleteMapping("/groups") // 그룹 삭제
     // public ResponseEntity<String> groupDelete(@Validated @RequestBody
     // DeleteGroupRequest request) {
     // return ResponseEntity.status(HttpStatus.OK)
