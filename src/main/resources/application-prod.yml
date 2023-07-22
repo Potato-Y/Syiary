@@ -1,0 +1,11 @@
+# 운영 환경 전용
+server:
+  error:
+    include-message: never
+
+jwt:
+  issuer: ${jwt_issuer}
+  secret_key: ${jwt_secret_key}
+
+env:
+  mode: prod
