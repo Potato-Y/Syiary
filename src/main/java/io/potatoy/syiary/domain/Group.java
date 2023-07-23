@@ -25,8 +25,8 @@ public class Group {
     @Column(name = "id", updatable = false)
     private Long id; // 자동 생성 고유 ID
 
-    @Column(name = "group_id", nullable = false, unique = true, updatable = false)
-    private String groupId; // 외부에 사용될 고유 id
+    @Column(name = "group_uri", nullable = false, unique = true, updatable = false)
+    private String groupUri; // 외부에 사용될 고유 id
 
     @Column(name = "group_name", nullable = false)
     private String groupName; // 그룹 이름
@@ -35,14 +35,26 @@ public class Group {
     private Long hostId; // 방장 user id
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "active", nullable = false)
+    @Column(name = "state", nullable = false)
     private State state;
 
     @Builder
-    public Group(String groupId, String groupName, Long hostId, State state) {
-        this.groupId = groupId;
+    public Group(String groupUri, String groupName, Long hostId, State state) {
+        this.groupUri = groupUri;
         this.groupName = groupName;
         this.hostId = hostId;
         this.state = state;
+    }
+
+    /**
+     * group state 변경
+     * 
+     * @param state
+     * @return
+     */
+    public Group updateState(State state) {
+        this.state = state;
+
+        return this;
     }
 }

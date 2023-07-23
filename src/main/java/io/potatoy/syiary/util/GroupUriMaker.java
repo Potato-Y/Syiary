@@ -2,7 +2,7 @@ package io.potatoy.syiary.util;
 
 import java.util.Random;
 
-public class GroupIDMaker {
+public class GroupUriMaker {
 
     private static final String CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private static final int MIN_LENGTH = 6;

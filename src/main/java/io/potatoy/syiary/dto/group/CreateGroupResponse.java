@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Getter
 public class CreateGroupResponse {
     private Long id;
-    private String groupId;
+    private String groupUri;
     private String groupName;
 }

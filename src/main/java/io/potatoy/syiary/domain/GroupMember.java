@@ -26,7 +26,7 @@ public class GroupMember {
     private Long userId;
 
     @ManyToOne
-    @JoinColumn(name = "groups")
+    @JoinColumn(name = "group_id")
     private Group group;
 
     @Builder
