@@ -101,7 +101,7 @@ public class GroupService {
          * 2. 요청한 group uri와 db에서 불러온 group의 uri가 동일한지 확인한다.
          * 3. user가 작성한 sign과 group 이름과 동일한지 확인한다.
          */
-        if (userId.equals(loadGroup.getHostId())) {
+        if (!userId.equals(loadGroup.getHostId())) {
             // host id와 요청자의 id가 동일하지 않음
             throw new GroupException("The group host and the requester's id are not the same.");
         }
