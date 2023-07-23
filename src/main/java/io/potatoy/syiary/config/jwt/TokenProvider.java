@@ -14,7 +14,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.potatoy.syiary.domain.User;
+import io.potatoy.syiary.user.entity.User;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

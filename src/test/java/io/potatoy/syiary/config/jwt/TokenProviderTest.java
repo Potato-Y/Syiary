@@ -14,8 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import io.jsonwebtoken.Jwts;
-import io.potatoy.syiary.domain.User;
-import io.potatoy.syiary.repository.UserRepository;
+import io.potatoy.syiary.user.entity.User;
+import io.potatoy.syiary.user.entity.UserRepository;
 
 @SpringBootTest
 public class TokenProviderTest {

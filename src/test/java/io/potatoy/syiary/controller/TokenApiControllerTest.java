@@ -23,12 +23,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.potatoy.syiary.config.jwt.JwtProperties;
 import io.potatoy.syiary.config.jwt.TokenProvider;
-import io.potatoy.syiary.domain.RefreshToken;
-import io.potatoy.syiary.domain.User;
-import io.potatoy.syiary.dto.auth.AuthenticateRequest;
-import io.potatoy.syiary.dto.auth.TokenRequest;
-import io.potatoy.syiary.repository.RefreshTokenRepository;
-import io.potatoy.syiary.repository.UserRepository;
+import io.potatoy.syiary.token.entity.RefreshToken;
+import io.potatoy.syiary.user.entity.User;
+import io.potatoy.syiary.token.dto.AuthenticateRequest;
+import io.potatoy.syiary.token.dto.TokenRequest;
+import io.potatoy.syiary.token.entity.RefreshTokenRepository;
+import io.potatoy.syiary.user.entity.UserRepository;
 
 @SpringBootTest // 테스트용 애플리케이션 컨텍스트
 @AutoConfigureMockMvc // MockMvc 생성

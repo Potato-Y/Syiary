@@ -1,7 +1,7 @@
 package io.potatoy.syiary.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.potatoy.syiary.dto.user.AddUserRequest;
+import io.potatoy.syiary.user.dto.AddUserRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
