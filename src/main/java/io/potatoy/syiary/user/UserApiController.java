@@ -3,7 +3,6 @@ package io.potatoy.syiary.user;
 import io.potatoy.syiary.user.entity.User;
 import io.potatoy.syiary.user.dto.AddUserRequest;
 import io.potatoy.syiary.user.dto.AddUserResponse;
-import io.potatoy.syiary.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

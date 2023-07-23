@@ -1,6 +1,5 @@
 package io.potatoy.syiary.group.entity;
 
-import io.potatoy.syiary.group.entity.Group;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
