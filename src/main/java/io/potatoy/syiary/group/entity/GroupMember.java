@@ -1,5 +1,6 @@
 package io.potatoy.syiary.group.entity;
 
+import io.potatoy.syiary.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,16 +23,17 @@ public class GroupMember {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne
-    @JoinColumn(name = "group_id")
+    @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
     @Builder
-    public GroupMember(Long userId, Group group) {
-        this.userId = userId;
+    public GroupMember(User user, Group group) {
+        this.user = user;
         this.group = group;
     }
 }

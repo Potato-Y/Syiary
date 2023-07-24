@@ -1,6 +1,7 @@
 package io.potatoy.syiary.group.entity;
 
 import io.potatoy.syiary.enums.State;
+import io.potatoy.syiary.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -8,6 +9,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -31,18 +34,19 @@ public class Group {
     @Column(name = "group_name", nullable = false)
     private String groupName; // 그룹 이름
 
-    @Column(name = "host_id", nullable = false)
-    private Long hostId; // 방장 user id
+    @ManyToOne
+    @JoinColumn(name = "host_id", nullable = false)
+    private User hostUser; // 방장 user id
 
     @Enumerated(EnumType.STRING)
     @Column(name = "state", nullable = false)
     private State state;
 
     @Builder
-    public Group(String groupUri, String groupName, Long hostId, State state) {
+    public Group(String groupUri, String groupName, User hostUser, State state) {
         this.groupUri = groupUri;
         this.groupName = groupName;
-        this.hostId = hostId;
+        this.hostUser = hostUser;
         this.state = state;
     }
 

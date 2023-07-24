@@ -44,8 +44,7 @@ public class GroupService {
         // User 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        Optional<User> user = userRepository.findByEmail(userDetails.getUsername());
-        Long userId = user.get().getId();
+        User user = userRepository.findByEmail(userDetails.getUsername()).get();
 
         GroupUriMaker groupUriMaker = new GroupUriMaker(); // 그룹 id를 만들기 위해
         String groupUri;
@@ -68,17 +67,17 @@ public class GroupService {
                 Group.builder()
                         .groupUri(groupUri)
                         .groupName(dto.getGroupName())
-                        .hostId(userId)
+                        .hostUser(user)
                         .state(State.ACTIVE)
                         .build());
         // group member에 만든 본인 추가
         groupMemberRepository.save(
                 GroupMember.builder()
-                        .userId(userId)
+                        .user(user)
                         .group(group)
                         .build());
 
-        logger.info("createGroup. userId={}, groupId={}, groupUri={}, groupName={}", userId, group.getId(),
+        logger.info("createGroup. userId={}, groupId={}, groupUri={}, groupName={}", user.getId(), group.getId(),
                 group.getGroupUri(), group.getGroupName());
 
         return new CreateGroupResponse(group.getId(), group.getGroupUri(), group.getGroupName());
@@ -105,7 +104,7 @@ public class GroupService {
          * 2. 요청한 group uri와 db에서 불러온 group의 uri가 동일한지 확인한다.
          * 3. user가 작성한 sign과 group 이름과 동일한지 확인한다.
          */
-        if (userId.equals(loadGroup.getHostId())) {
+        if (!userId.equals(loadGroup.getHostUser().getId())) {
             // host id와 요청자의 id가 동일하지 않음
             String message = "The group host and the requester's id are not the same.";
             logger.warn("deleteGroup:GroupException. message={}", message);
