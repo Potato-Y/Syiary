@@ -6,6 +6,9 @@ import java.util.Optional;
 import io.potatoy.syiary.group.entity.GroupMember;
 import io.potatoy.syiary.group.entity.GroupMemberRepository;
 import io.potatoy.syiary.group.entity.GroupRepository;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class GroupService {
 
+    private final Logger logger = LogManager.getLogger(GroupService.class);
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final UserRepository userRepository;
@@ -42,9 +46,6 @@ public class GroupService {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Optional<User> user = userRepository.findByEmail(userDetails.getUsername());
         Long userId = user.get().getId();
-        System.out.println("*************************");
-
-        System.out.println(userDetails.getUsername());
 
         GroupUriMaker groupUriMaker = new GroupUriMaker(); // 그룹 id를 만들기 위해
         String groupUri;
@@ -77,6 +78,9 @@ public class GroupService {
                         .group(group)
                         .build());
 
+        logger.info("createGroup. userId={}, groupId={}, groupUri={}, groupName={}", userId, group.getId(),
+                group.getGroupUri(), group.getGroupName());
+
         return new CreateGroupResponse(group.getId(), group.getGroupUri(), group.getGroupName());
     }
 
@@ -101,23 +105,33 @@ public class GroupService {
          * 2. 요청한 group uri와 db에서 불러온 group의 uri가 동일한지 확인한다.
          * 3. user가 작성한 sign과 group 이름과 동일한지 확인한다.
          */
-        if (!userId.equals(loadGroup.getHostId())) {
+        if (userId.equals(loadGroup.getHostId())) {
             // host id와 요청자의 id가 동일하지 않음
-            throw new GroupException("The group host and the requester's id are not the same.");
+            String message = "The group host and the requester's id are not the same.";
+            logger.warn("deleteGroup:GroupException. message={}", message);
+
+            throw new GroupException(message);
         }
         if (!groupUri.equals(loadGroup.getGroupUri())) {
             // 요청한 uri과 디비의 uri이 다름.
-            throw new GroupException("Requested uri and db uri are different.");
+            String message = "Requested uri and db uri are different.";
+            logger.warn("deleteGroup:GroupException. message={}", message);
+
+            throw new GroupException(message);
         }
         if (!dto.getGroupNameSign().equals(loadGroup.getGroupName())) {
             // 사용자가 입력한 그룹 이름과 실제 그룹 이름이 같지 않음.
-            throw new GroupException("The group name entered by the user and the actual group name are not the same.");
+            String message = "The group name entered by the user and the actual group name are not the same.";
+            logger.warn("deleteGroup:GroupException. message={}", message);
+
+            throw new GroupException(message);
         }
 
         // 그룹에 해당되는 멤버를 모두 삭제
         List<GroupMember> groupMember = groupMemberRepository.findByGroup(loadGroup);
         groupMemberRepository.deleteAll(groupMember);
 
+        logger.info("deleteGroup. userId={}, groupId={}", userId, loadGroup.getId());
         groupRepository.delete(loadGroup);
     }
 

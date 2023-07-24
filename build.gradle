@@ -32,6 +32,7 @@ dependencies {
     implementation('io.jsonwebtoken:jjwt:0.9.1') // 자바 jwt 라이브러리
     implementation('javax.xml.bind:jaxb-api:2.3.1') // XML 문서와 JAVA 객체 간 매핑을 자동화
     implementation('org.springframework.boot:spring-boot-starter-validation:3.1.1') // validation
+    implementation('org.springframework.boot:spring-boot-starter-log4j2:3.1.2') // log4j2
 
     developmentOnly('org.springframework.boot:spring-boot-devtools:3.0.4') // 변경 내용 자동 재시작 추가
 
@@ -49,4 +50,11 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+configurations {
+    all{
+        // 내부 로깅 프레임워크 Logback을 제외
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    }
 }

@@ -4,6 +4,9 @@ import io.potatoy.syiary.user.entity.User;
 import io.potatoy.syiary.user.dto.AddUserRequest;
 import io.potatoy.syiary.user.entity.UserRepository;
 import lombok.RequiredArgsConstructor;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,16 +14,20 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
+    private final Logger logger = LogManager.getLogger(UserService.class);
     private final UserRepository userRepository;
 
     public User save(AddUserRequest dto) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
-        return userRepository.save(
-                User.builder()
-                        .email(dto.getEmail())
-                        .password(encoder.encode(dto.getPassword()))
-                        .build());
+        User user = userRepository.save(User.builder()
+                .email(dto.getEmail())
+                .password(encoder.encode(dto.getPassword()))
+                .build());
+
+        logger.info("save. userId={}, userEmail={}", user.getId(), user.getEmail());
+
+        return user;
     }
 
     public User findById(Long userId) {
