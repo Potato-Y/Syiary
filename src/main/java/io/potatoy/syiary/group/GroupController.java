@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.potatoy.syiary.group.dto.CreateGroupRequest;
 import io.potatoy.syiary.group.dto.CreateGroupResponse;
 import io.potatoy.syiary.group.dto.DeleteGroupRequest;
+import io.potatoy.syiary.group.dto.SignupGroupRequest;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -33,6 +34,14 @@ public class GroupController {
     public ResponseEntity<String> groupDelete(@PathVariable String groupUri,
             @Validated @RequestBody DeleteGroupRequest request) {
         groupService.deleteGroup(groupUri, request);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+    @PostMapping("/groups/{groupUri}/members") // 그룹에 유저 추가
+    public ResponseEntity<String> groupSignup(@PathVariable String groupUri,
+            @Validated @RequestBody SignupGroupRequest request) {
+        groupService.signupGroup(groupUri, request);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }

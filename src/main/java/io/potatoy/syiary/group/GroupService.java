@@ -20,8 +20,11 @@ import io.potatoy.syiary.enums.State;
 import io.potatoy.syiary.group.dto.CreateGroupRequest;
 import io.potatoy.syiary.group.dto.CreateGroupResponse;
 import io.potatoy.syiary.group.dto.DeleteGroupRequest;
+import io.potatoy.syiary.group.dto.SignupGroupRequest;
 import io.potatoy.syiary.group.exception.GroupException;
+import io.potatoy.syiary.security.util.SecurityUtil;
 import io.potatoy.syiary.user.entity.UserRepository;
+import io.potatoy.syiary.user.exception.NotFoundUserEmailException;
 import io.potatoy.syiary.util.GroupUriMaker;
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +36,7 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
     private final UserRepository userRepository;
+    private final SecurityUtil securityUtil;
 
     /**
      * 새로운 그룹 생성
@@ -132,6 +136,57 @@ public class GroupService {
 
         logger.info("deleteGroup. userId={}, groupId={}", userId, loadGroup.getId());
         groupRepository.delete(loadGroup);
+    }
+
+    /**
+     * Host가 사용자를 group에 추가한다.
+     * 
+     * @param groupUri
+     * @param dto
+     */
+    public void signupGroup(String groupUri, SignupGroupRequest dto) {
+        // 유저 정보를 가져온다.
+        User user = securityUtil.getCurrentUser();
+
+        // 그룹 정보를 불러온다.
+        Group group = groupRepository.findById(dto.getGorupId()).get();
+
+        // 요청자가 host가 맞는지 확인한다.
+        if (!group.getHostUser().getId().equals(user.getId())) {
+            // Group의 Host User와 User가 동일하지 않습니다.
+            String message = "Group Host User and User are not the same.";
+            logger.warn("signupGroup:GroupException. userId={}, groupId={}\nmessage={}", user.getId(), group.getId(),
+                    message);
+
+            throw new GroupException(message);
+        }
+
+        // 초대하고자 하는 유저가 존재하는지 확인하고, 존재하면 불러온다.
+        Optional<User> guestUser = userRepository.findByEmail(dto.getUserEmail());
+        if (guestUser.isEmpty()) {
+            String message = "User not found.";
+            logger.warn("signupGroup:NotFoundUserEmailException. message={}", message);
+
+            throw new NotFoundUserEmailException(message);
+        }
+
+        // 이미 추가되어 있는 유저인지 확인한다.
+        Optional<GroupMember> member = groupMemberRepository.findByUserAndGroup(guestUser.get(), group);
+        if (member.isPresent()) {
+            // 유저가 이미 그룹에 있음.
+            String message = "User is already in a group.";
+            logger.warn("signupGroup:GroupException. groupId={}, userId={}, guestUserId={}", group.getId(),
+                    user.getId(), guestUser.get().getId());
+
+            throw new GroupException(message);
+        }
+
+        // 유저 추가 및 저장
+        groupMemberRepository.save(
+                GroupMember.builder()
+                        .user(guestUser.get())
+                        .group(group)
+                        .build());
     }
 
 }
