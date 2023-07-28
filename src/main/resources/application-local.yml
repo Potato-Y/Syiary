@@ -12,7 +12,7 @@ spring:
       enabled: true # 코드 변경시 자동 재시작
   jpa:
     # 전송 쿼리 확인
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true

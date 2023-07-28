@@ -1,5 +1,6 @@
 package io.potatoy.syiary.group;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +18,7 @@ import io.potatoy.syiary.enums.State;
 import io.potatoy.syiary.group.dto.CreateGroupRequest;
 import io.potatoy.syiary.group.dto.CreateGroupResponse;
 import io.potatoy.syiary.group.dto.DeleteGroupRequest;
+import io.potatoy.syiary.group.dto.GroupInfoResponse;
 import io.potatoy.syiary.group.dto.SecessionGroupRequest;
 import io.potatoy.syiary.group.dto.SignupGroupRequest;
 import io.potatoy.syiary.group.exception.GroupException;
@@ -82,6 +84,32 @@ public class GroupService {
                 group.getGroupUri(), group.getGroupName());
 
         return new CreateGroupResponse(group.getId(), group.getGroupUri(), group.getGroupName());
+    }
+
+    /**
+     * User가 속해있는 group들의 정보를 반환한다.
+     * 
+     * @return
+     */
+    public List<GroupInfoResponse> loadGroups() {
+        // User 정보 가져오기
+        User user = securityUtil.getCurrentUser();
+
+        // User 정보를 통해 속해있는 group 리스트 가져오기
+        List<GroupMember> inMembers = groupMemberRepository.findByUser(user);
+
+        ArrayList<GroupInfoResponse> groups = new ArrayList<>();
+
+        for (GroupMember member : inMembers) {
+            Group group = member.getGroup();
+            GroupInfoResponse response = new GroupInfoResponse(group.getId(), group.getGroupUri(),
+                    group.getGroupName());
+
+            groups.add(response);
+        }
+
+        logger.info("loadGroups. userId={}", user.getId());
+        return groups;
     }
 
     /**
@@ -184,6 +212,12 @@ public class GroupService {
                         .build());
     }
 
+    /**
+     * host가 group에 속해있는 특정 user를 탈퇴시킨다.
+     * 
+     * @param groupUri
+     * @param dto
+     */
     public void secessionGroup(String groupUri, SecessionGroupRequest dto) {
         // 유저 정보를 가져온다.
         User user = securityUtil.getCurrentUser();

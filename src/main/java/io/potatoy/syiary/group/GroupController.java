@@ -1,5 +1,7 @@
 package io.potatoy.syiary.group;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.potatoy.syiary.group.dto.CreateGroupRequest;
 import io.potatoy.syiary.group.dto.CreateGroupResponse;
 import io.potatoy.syiary.group.dto.DeleteGroupRequest;
+import io.potatoy.syiary.group.dto.GroupInfoResponse;
 import io.potatoy.syiary.group.dto.SecessionGroupRequest;
 import io.potatoy.syiary.group.dto.SignupGroupRequest;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,13 @@ public class GroupController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(groupService.createGroup(request));
+    }
+
+    @GetMapping("/groups") // 그룹 목록 가져오기
+    public ResponseEntity<List<GroupInfoResponse>> groupList() {
+        List<GroupInfoResponse> groups = groupService.loadGroups();
+
+        return ResponseEntity.status(HttpStatus.OK).body(groups);
     }
 
     @PostMapping("/groups/{groupUri}/members") // 그룹에 유저 추가
