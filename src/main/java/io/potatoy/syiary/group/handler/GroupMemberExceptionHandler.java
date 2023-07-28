@@ -6,23 +6,21 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import io.potatoy.syiary.error.dto.ErrorResponse;
+import io.potatoy.syiary.error.dto.handler.AbstractExceptionHandler;
 import io.potatoy.syiary.group.exception.GroupMemberException;
 import io.potatoy.syiary.util.EnvProperties;
 
 @RestControllerAdvice
-public class GroupMemberExceptionHandler {
-
-    public static final String PROD = "prod";
-
-    private final EnvProperties envProperties;
+public class GroupMemberExceptionHandler extends AbstractExceptionHandler<GroupMemberException> {
 
     public GroupMemberExceptionHandler(EnvProperties envProperties) {
-        this.envProperties = envProperties;
+        super(envProperties);
     }
 
+    @Override
     @ExceptionHandler(GroupMemberException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleGroupException(GroupMemberException exception) {
+    public ErrorResponse handleException(GroupMemberException exception) {
         if (envProperties.getMode().equals(PROD)) { // 운영 환경에서는 상세 내용을 반환하지 않도록 설정
             return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), null);
         }

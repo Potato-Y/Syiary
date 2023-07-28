@@ -6,23 +6,21 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import io.potatoy.syiary.error.dto.ErrorResponse;
+import io.potatoy.syiary.error.dto.handler.AbstractExceptionHandler;
 import io.potatoy.syiary.group.exception.GroupException;
 import io.potatoy.syiary.util.EnvProperties;
 
 @RestControllerAdvice
-public class GroupExceptionHandler {
-
-    public static final String PROD = "prod";
-
-    private final EnvProperties envProperties;
+public class GroupExceptionHandler extends AbstractExceptionHandler<GroupException> {
 
     public GroupExceptionHandler(EnvProperties envProperties) {
-        this.envProperties = envProperties;
+        super(envProperties);
     }
 
+    @Override
     @ExceptionHandler(GroupException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleGroupHostIDMatchingException(GroupException exception) {
+    public ErrorResponse handleException(GroupException exception) {
         if (envProperties.getMode().equals(PROD)) { // 운영 환경에서는 상세 내용을 반환하지 않도록 설정
             return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), null);
         }

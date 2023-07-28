@@ -25,7 +25,7 @@ import io.potatoy.syiary.group.exception.GroupException;
 import io.potatoy.syiary.group.exception.GroupMemberException;
 import io.potatoy.syiary.security.util.SecurityUtil;
 import io.potatoy.syiary.user.entity.UserRepository;
-import io.potatoy.syiary.user.exception.NotFoundUserEmailException;
+import io.potatoy.syiary.user.exception.NotFoundUserException;
 import io.potatoy.syiary.util.GroupUriMaker;
 import lombok.RequiredArgsConstructor;
 
@@ -190,7 +190,7 @@ public class GroupService {
             String message = "User not found.";
             logger.warn("signupGroup:NotFoundUserEmailException. message={}", message);
 
-            throw new NotFoundUserEmailException(message);
+            throw new NotFoundUserException(message);
         }
 
         // 이미 추가되어 있는 유저인지 확인한다.
@@ -242,12 +242,12 @@ public class GroupService {
             logger.warn("secessionGroup:NotFoundUserEmailException. userId={}, leaveUserEmail={}\nmessage={}",
                     user.getId(), dto.getUserEmail(), message);
 
-            throw new NotFoundUserEmailException(message);
+            throw new NotFoundUserException(message);
         }
 
         // 멤버 디비에서 불러온다.
         Optional<GroupMember> memberUser = groupMemberRepository.findByUserAndGroup(leaveUser.get(), group);
-        if (leaveUser.isEmpty()) {
+        if (memberUser.isEmpty()) {
             String message = "There are no users in the member list.";
             logger.warn("secessionGroup:GroupMemberException. userId={}, groupId={},leaveUserId={}\nmessage={}",
                     user.getId(), group.getId(), leaveUser.get().getId());
