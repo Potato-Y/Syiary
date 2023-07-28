@@ -40,6 +40,20 @@ public class GroupService {
     private final SecurityUtil securityUtil;
 
     /**
+     * GroupMember 객체를 생성하여 반환한다.
+     * 
+     * @param user
+     * @param group
+     * @return
+     */
+    private GroupMember createGroupMemberEntity(User user, Group group) {
+        return GroupMember.builder()
+                .user(user)
+                .group(group)
+                .build();
+    }
+
+    /**
      * 새로운 그룹 생성
      * 
      * @param dto
@@ -75,10 +89,7 @@ public class GroupService {
                         .build());
         // group member에 만든 본인 추가
         groupMemberRepository.save(
-                GroupMember.builder()
-                        .user(user)
-                        .group(group)
-                        .build());
+                createGroupMemberEntity(user, group));
 
         logger.info("createGroup. userId={}, groupId={}, groupUri={}, groupName={}", user.getId(), group.getId(),
                 group.getGroupUri(), group.getGroupName());
@@ -206,10 +217,7 @@ public class GroupService {
 
         // 유저 추가 및 저장
         groupMemberRepository.save(
-                GroupMember.builder()
-                        .user(guestUser.get())
-                        .group(group)
-                        .build());
+                createGroupMemberEntity(guestUser.get(), group));
     }
 
     /**
