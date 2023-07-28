@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,14 +32,6 @@ public class GroupController {
                 .body(groupService.createGroup(request));
     }
 
-    @DeleteMapping("/groups/{groupUri}") // 그룹 삭제
-    public ResponseEntity<String> groupDelete(@PathVariable String groupUri,
-            @Validated @RequestBody DeleteGroupRequest request) {
-        groupService.deleteGroup(groupUri, request);
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-    }
-
     @PostMapping("/groups/{groupUri}/members") // 그룹에 유저 추가
     public ResponseEntity<String> groupSignup(@PathVariable String groupUri,
             @Validated @RequestBody SignupGroupRequest request) {
@@ -48,9 +41,17 @@ public class GroupController {
     }
 
     @DeleteMapping("/groups/{groupUri}/members") // 그룹에서 멤버 탈퇴
-    public ResponseEntity<String> gorupSecession(@PathVariable String groupUri,
+    public ResponseEntity<String> groupSecession(@PathVariable String groupUri,
             @Validated @RequestBody SecessionGroupRequest request) {
         groupService.secessionGroup(groupUri, request);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+    @DeleteMapping("/groups/{groupUri}") // 그룹 삭제
+    public ResponseEntity<String> groupDelete(@PathVariable String groupUri,
+            @Validated @RequestBody DeleteGroupRequest request) {
+        groupService.deleteGroup(groupUri, request);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }
