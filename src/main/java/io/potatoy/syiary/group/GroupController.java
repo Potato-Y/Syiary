@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.potatoy.syiary.group.dto.CreateGroupRequest;
 import io.potatoy.syiary.group.dto.CreateGroupResponse;
 import io.potatoy.syiary.group.dto.DeleteGroupRequest;
+import io.potatoy.syiary.group.dto.SecessionGroupRequest;
 import io.potatoy.syiary.group.dto.SignupGroupRequest;
 import lombok.RequiredArgsConstructor;
 
@@ -42,6 +43,14 @@ public class GroupController {
     public ResponseEntity<String> groupSignup(@PathVariable String groupUri,
             @Validated @RequestBody SignupGroupRequest request) {
         groupService.signupGroup(groupUri, request);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+    }
+
+    @DeleteMapping("/groups/{groupUri}/members") // 그룹에서 멤버 탈퇴
+    public ResponseEntity<String> gorupSecession(@PathVariable String groupUri,
+            @Validated @RequestBody SecessionGroupRequest request) {
+        groupService.secessionGroup(groupUri, request);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
     }

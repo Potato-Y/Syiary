@@ -10,7 +10,9 @@ import lombok.Setter;
 @AllArgsConstructor // 모든 필드 값을 파라미터로 받는 생성자 추가
 @Getter
 @Setter
-public class SignupGroupRequest {
+public class SecessionGroupRequest {
+    // 사용자를 그룹에서 추방시킨다.
+
     @NotNull
     private Long groupId;
     @NotNull

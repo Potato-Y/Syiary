@@ -17,8 +17,10 @@ import io.potatoy.syiary.enums.State;
 import io.potatoy.syiary.group.dto.CreateGroupRequest;
 import io.potatoy.syiary.group.dto.CreateGroupResponse;
 import io.potatoy.syiary.group.dto.DeleteGroupRequest;
+import io.potatoy.syiary.group.dto.SecessionGroupRequest;
 import io.potatoy.syiary.group.dto.SignupGroupRequest;
 import io.potatoy.syiary.group.exception.GroupException;
+import io.potatoy.syiary.group.exception.GroupMemberException;
 import io.potatoy.syiary.security.util.SecurityUtil;
 import io.potatoy.syiary.user.entity.UserRepository;
 import io.potatoy.syiary.user.exception.NotFoundUserEmailException;
@@ -142,7 +144,7 @@ public class GroupService {
         User user = securityUtil.getCurrentUser();
 
         // 그룹 정보를 불러온다.
-        Group group = groupRepository.findById(dto.getGorupId()).get();
+        Group group = groupRepository.findById(dto.getGroupId()).get();
 
         // 요청자가 host가 맞는지 확인한다.
         if (!group.getHostUser().getId().equals(user.getId())) {
@@ -180,6 +182,46 @@ public class GroupService {
                         .user(guestUser.get())
                         .group(group)
                         .build());
+    }
+
+    public void secessionGroup(String groupUri, SecessionGroupRequest dto) {
+        // 유저 정보를 가져온다.
+        User user = securityUtil.getCurrentUser();
+
+        // 그룹 정보를 불러온다.
+        Group group = groupRepository.findById(dto.getGroupId()).get();
+
+        // 요청자가 host가 맞는지 확인한다.
+        if (!group.getHostUser().getId().equals(user.getId())) {
+            // Group의 Host User와 User가 동일하지 않습니다.
+            String message = "Group Host User and User are not the same.";
+            logger.warn("secessionGroup:GroupException. userId={}, groupId={}\nmessage={}", user.getId(), group.getId(),
+                    message);
+
+            throw new GroupException(message);
+        }
+
+        // 탈퇴하고자 하는 유저가 존재하는지 확인하고, 존재하면 불러온다.
+        Optional<User> leaveUser = userRepository.findByEmail(dto.getUserEmail());
+        if (leaveUser.isEmpty()) {
+            String message = "User not found.";
+            logger.warn("secessionGroup:NotFoundUserEmailException. userId={}, leaveUserEmail={}\nmessage={}",
+                    user.getId(), dto.getUserEmail(), message);
+
+            throw new NotFoundUserEmailException(message);
+        }
+
+        // 멤버 디비에서 불러온다.
+        Optional<GroupMember> memberUser = groupMemberRepository.findByUserAndGroup(leaveUser.get(), group);
+        if (leaveUser.isEmpty()) {
+            String message = "There are no users in the member list.";
+            logger.warn("secessionGroup:GroupMemberException. userId={}, groupId={},leaveUserId={}\nmessage={}",
+                    user.getId(), group.getId(), leaveUser.get().getId());
+
+            throw new GroupMemberException(message);
+        }
+
+        groupMemberRepository.delete(memberUser.get());
     }
 
 }
