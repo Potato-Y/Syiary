@@ -9,9 +9,6 @@ import io.potatoy.syiary.group.entity.GroupRepository;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import io.potatoy.syiary.group.entity.Group;
@@ -46,9 +43,7 @@ public class GroupService {
      */
     public CreateGroupResponse createGroup(CreateGroupRequest dto) {
         // User 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        User user = userRepository.findByEmail(userDetails.getUsername()).get();
+        User user = securityUtil.getCurrentUser();
 
         GroupUriMaker groupUriMaker = new GroupUriMaker(); // 그룹 id를 만들기 위해
         String groupUri;
@@ -95,10 +90,8 @@ public class GroupService {
      */
     public void deleteGroup(String groupUri, DeleteGroupRequest dto) {
         // User 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        Optional<User> user = userRepository.findByEmail(userDetails.getUsername());
-        Long userId = user.get().getId();
+        User user = securityUtil.getCurrentUser();
+        Long userId = user.getId();
 
         Group loadGroup = groupRepository.findById(dto.getId()).get();
 
