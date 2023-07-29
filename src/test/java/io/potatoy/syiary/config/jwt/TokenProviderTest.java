@@ -12,12 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.test.context.ActiveProfiles;
 
 import io.jsonwebtoken.Jwts;
 import io.potatoy.syiary.user.entity.User;
 import io.potatoy.syiary.user.entity.UserRepository;
 
 @SpringBootTest
+@ActiveProfiles("local")
 public class TokenProviderTest {
 
     @Autowired
