@@ -65,7 +65,7 @@ public class GroupControllerTest {
         testUtil = new TestUtil(bCryptPasswordEncoder, userRepository, groupRepository, groupMemberRepository);
     }
 
-    @DisplayName("groupCreate(): 그룹 만들기 성공")
+    @DisplayName("createGroup(): 그룹 만들기 성공")
     @WithMockUser(username = "host@mail.com")
     @Test
     public void successCreateGroup() throws Exception {
@@ -127,7 +127,7 @@ public class GroupControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    @DisplayName("groupSignup(): 그룹의 멤버를 추가한다.")
+    @DisplayName("signupGroup(): 그룹의 멤버를 추가한다.")
     @WithMockUser(username = "host@mail.com")
     @Test
     public void successSignupGroup() throws Exception {
@@ -154,10 +154,10 @@ public class GroupControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    @DisplayName("groupSecession(): 그룹의 멤버를 제거한다.")
+    @DisplayName("secessionGroup(): 그룹의 멤버를 제거한다.")
     @WithMockUser(username = "host@mail.com")
     @Test
-    public void successGroupSecession() throws Exception {
+    public void successSecessionGroup() throws Exception {
         // given 멤버 제거를 위한 그룹과 멤버들 생성
         final String url = "/api/groups/{groupUri}/members";
         final String groupName = "test_group";
@@ -182,10 +182,10 @@ public class GroupControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    @DisplayName("groupList(): 가입한 그룹의 리스트를 모두 가져온다.")
+    @DisplayName("getGroupList(): 가입한 그룹의 리스트를 모두 가져온다.")
     @WithMockUser("member@mail.com")
     @Test
-    public void successGroupList() throws Exception {
+    public void successGetGroupList() throws Exception {
         // given 그룹 정보를 불러오기 위한 객체들 생성
         final String url = "/api/groups";
         final String groupName1 = "test_group_1";

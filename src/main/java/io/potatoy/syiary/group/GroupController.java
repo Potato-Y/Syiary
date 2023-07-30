@@ -29,21 +29,21 @@ public class GroupController {
     private final GroupService groupService;
 
     @PostMapping("/groups") // 그룹 생성
-    public ResponseEntity<CreateGroupResponse> groupCreate(@Validated @RequestBody CreateGroupRequest request) {
+    public ResponseEntity<CreateGroupResponse> createGroup(@Validated @RequestBody CreateGroupRequest request) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(groupService.createGroup(request));
     }
 
     @GetMapping("/groups") // 그룹 목록 가져오기
-    public ResponseEntity<List<GroupInfoResponse>> groupList() {
+    public ResponseEntity<List<GroupInfoResponse>> getGroupList() {
         List<GroupInfoResponse> groups = groupService.loadGroups();
 
         return ResponseEntity.status(HttpStatus.OK).body(groups);
     }
 
     @PostMapping("/groups/{groupUri}/members") // 그룹에 유저 추가
-    public ResponseEntity<String> groupSignup(@PathVariable String groupUri,
+    public ResponseEntity<String> signupGroup(@PathVariable String groupUri,
             @Validated @RequestBody SignupGroupRequest request) {
         groupService.signupGroup(groupUri, request);
 
@@ -51,7 +51,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/groups/{groupUri}/members") // 그룹에서 멤버 탈퇴
-    public ResponseEntity<String> groupSecession(@PathVariable String groupUri,
+    public ResponseEntity<String> secessionGroup(@PathVariable String groupUri,
             @Validated @RequestBody SecessionGroupRequest request) {
         groupService.secessionGroup(groupUri, request);
 
@@ -59,7 +59,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/groups/{groupUri}") // 그룹 삭제
-    public ResponseEntity<String> groupDelete(@PathVariable String groupUri,
+    public ResponseEntity<String> deleteGroup(@PathVariable String groupUri,
             @Validated @RequestBody DeleteGroupRequest request) {
         groupService.deleteGroup(groupUri, request);
 
