@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import io.potatoy.syiary.error.dto.ErrorResponse;
-import io.potatoy.syiary.error.dto.handler.AbstractExceptionHandler;
+import io.potatoy.syiary.error.handler.AbstractExceptionHandler;
 import io.potatoy.syiary.group.exception.GroupMemberException;
 import io.potatoy.syiary.util.EnvProperties;
 

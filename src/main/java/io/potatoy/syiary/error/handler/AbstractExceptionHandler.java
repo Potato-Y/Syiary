@@ -1,4 +1,4 @@
-package io.potatoy.syiary.error.dto.handler;
+package io.potatoy.syiary.error.handler;
 
 import io.potatoy.syiary.error.dto.ErrorResponse;
 import io.potatoy.syiary.util.EnvProperties;
