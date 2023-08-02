@@ -38,7 +38,7 @@ public class TestUtil {
     }
 
     public Group createTestGroup(User hostUser, String groupName) {
-        GroupUriMaker groupUriMaker = new GroupUriMaker(); // 그룹 id를 만들기 위해
+        UriMaker groupUriMaker = new UriMaker(); // 그룹 id를 만들기 위해
         String groupUri;
 
         while (true) {
