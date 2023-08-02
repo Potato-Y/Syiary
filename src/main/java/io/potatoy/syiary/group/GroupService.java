@@ -26,7 +26,7 @@ import io.potatoy.syiary.group.exception.GroupMemberException;
 import io.potatoy.syiary.security.util.SecurityUtil;
 import io.potatoy.syiary.user.entity.UserRepository;
 import io.potatoy.syiary.user.exception.NotFoundUserException;
-import io.potatoy.syiary.util.GroupUriMaker;
+import io.potatoy.syiary.util.UriMaker;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -63,7 +63,7 @@ public class GroupService {
         // User 정보 가져오기
         User user = securityUtil.getCurrentUser();
 
-        GroupUriMaker groupUriMaker = new GroupUriMaker(); // 그룹 id를 만들기 위해
+        UriMaker groupUriMaker = new UriMaker(); // 그룹 id를 만들기 위해
         String groupUri;
 
         while (true) {
@@ -257,8 +257,8 @@ public class GroupService {
         Optional<GroupMember> memberUser = groupMemberRepository.findByUserAndGroup(leaveUser.get(), group);
         if (memberUser.isEmpty()) {
             String message = "There are no users in the member list.";
-            logger.warn("secessionGroup:GroupMemberException. userId={}, groupId={},leaveUserId={}\nmessage={}",
-                    user.getId(), group.getId(), leaveUser.get().getId());
+            logger.warn("secessionGroup:GroupMemberException. userId={}, groupId={}, leaveUserId={}\nmessage={}",
+                    user.getId(), group.getId(), leaveUser.get().getId(), message);
 
             throw new GroupMemberException(message);
         }
