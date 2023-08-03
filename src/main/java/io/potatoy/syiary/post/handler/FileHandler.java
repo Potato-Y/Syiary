@@ -66,7 +66,7 @@ public class FileHandler {
                 FileType fileType;
 
                 // 확장자명이 없으면 잘 못된 파일
-                if (ObjectUtils.isEmpty(contentType)) {
+                if (ObjectUtils.isEmpty(contentType) || contentType == null) {
                     break;
                 } else {
                     if (contentType.contains("image/jpeg")) {

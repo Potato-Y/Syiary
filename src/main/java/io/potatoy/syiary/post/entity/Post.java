@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import io.potatoy.syiary.group.entity.Group;
@@ -72,14 +71,12 @@ public class Post {
         return this;
     }
 
-    public Post updateContent(String content, List<PostFile> postFiles) {
+    public Post updateContent(String content) {
         this.content = content;
-        this.files = postFiles;
 
         // 변경 시간 추가
         this.updatedAt = LocalDateTime.now();
 
         return this;
-
     }
 }
