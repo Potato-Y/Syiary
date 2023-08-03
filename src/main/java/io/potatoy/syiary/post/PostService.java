@@ -12,6 +12,7 @@ import io.potatoy.syiary.group.entity.GroupRepository;
 import io.potatoy.syiary.group.util.GroupUtil;
 import io.potatoy.syiary.post.dto.CreatePostRequest;
 import io.potatoy.syiary.post.dto.CreatePostResponse;
+import io.potatoy.syiary.post.dto.DeletePostRequest;
 import io.potatoy.syiary.post.dto.FixPostRequest;
 import io.potatoy.syiary.post.entity.Post;
 import io.potatoy.syiary.post.entity.PostFile;
@@ -105,5 +106,32 @@ public class PostService {
 
         // 내용을 수정하여 저장
         postRepository.save(post.get().updateContent(dto.getContent()));
+    }
+
+    public void deletePost(String groupUri, Long postId, DeletePostRequest dto) {
+        User user = securityUtil.getCurrentUser();
+        Group group = groupRepository.findById(dto.getGroupId()).get();
+        Optional<Post> post = postRepository.findById(postId);
+
+        // 포스트가 없는지 확인한다.
+        if (post.isEmpty()) {
+            String message = "There are no posts.";
+
+            logger.warn("fixPost:PostException. userId={}, groupId={}, postId={}\nmessage={}", user.getId(),
+                    group.getId(), postId, message);
+            throw new PostException(message);
+        }
+
+        // 삭제 권한이 있는 유저인지 확인한다.
+        Boolean authority = postUtil.checkDeleteAuthority(user, group, post.get());
+        if (authority == false) {
+            String message = "You do not have permission to delete posts.";
+
+            logger.warn("deletePost:PostException. userId={}, groupId={}, postId={}\nmessage={}", user.getId(),
+                    group.getId(), postId, message);
+            throw new PostException(groupUri);
+        }
+
+        postRepository.delete(post.get());
     }
 }
