@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:syiary_client/models/user_info.dart';
+import 'package:syiary_client/models/providers/user_info.dart';
 import 'package:syiary_client/screens/login_screen.dart';
 
 void main(List<String> args) async {

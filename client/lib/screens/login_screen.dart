@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:syiary_client/models/requests/authenticate_model.dart';
+import 'package:syiary_client/services/api_services.dart';
 import 'package:syiary_client/widgets/logo_widget.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -79,7 +81,16 @@ class LoginScreen extends StatelessWidget {
               width: itemWidth,
               height: itemHeight,
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () async {
+                  AuthenticationModel authentication =
+                      await ApiService.getAuthentication(
+                          idController.text, pwController.text);
+
+                  debugPrint('access: ${authentication.accessToken}');
+                  debugPrint('refresh: ${authentication.refreshToken}');
+
+                  // TODO token 상태관리에 추가
+                },
                 style: ButtonStyle(
                   shape: MaterialStateProperty.all(
                     RoundedRectangleBorder(
