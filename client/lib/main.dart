@@ -1,7 +1,64 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:syiary_client/models/user_info.dart';
+import 'package:syiary_client/screens/login_screen.dart';
 
-void main() {
-  runApp(const MyApp());
+void main(List<String> args) async {
+  /// Android 플랫폼에서 상단 바를 투명하게 수정
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle.dark.copyWith(
+      statusBarBrightness: Brightness.light,
+      statusBarColor: Colors.transparent,
+
+      /// 안드로이드 플랫폼에서 네비게이션 바의 배경 색을 설정
+      systemNavigationBarColor: Colors.white,
+    ),
+  );
+
+  /// 앱 파일의 유요한 디렉터리로 Hive 초기화
+  await Hive.initFlutter();
+
+  await Hive.openBox('app');
+
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (_) => UserInfo(),
+      )
+    ],
+    child: const App(),
+  ));
+}
+
+class App extends StatelessWidget {
+  const App({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final box = Hive.box('app');
+    bool accountStatus = false; // 계정 접근 상태를 나타냄
+    String? accessToken = box.get('accessToken');
+    String? refreshToken = box.get('refreshToken');
+
+    if (accessToken != null && refreshToken != null) {
+      /// db에 token 정보가 있을 경우 계정 정보가 있으므로 status를 true로 변경한다.
+      debugPrint('accessToken: $accessToken\nrefreshToken: $refreshToken');
+      accountStatus = true;
+    }
+
+    return MaterialApp(
+      title: 'Syiary',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
+        useMaterial3: true,
+      ),
+      home: accountStatus
+          ? const MyHomePage(title: 'Flutter Demo Home Page')
+          : LoginScreen(),
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
