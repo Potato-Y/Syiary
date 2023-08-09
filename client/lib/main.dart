@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:syiary_client/models/providers/user_info.dart';
 import 'package:syiary_client/screens/login_screen.dart';
+import 'package:syiary_client/screens/signup_screen.dart';
 
 void main(List<String> args) async {
   /// Android 플랫폼에서 상단 바를 투명하게 수정
@@ -48,15 +50,31 @@ class App extends StatelessWidget {
       accountStatus = true;
     }
 
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Syiary',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
         useMaterial3: true,
       ),
-      home: accountStatus
-          ? const MyHomePage(title: 'Flutter Demo Home Page')
-          : LoginScreen(),
+      routerConfig: GoRouter(
+        initialLocation: '/main',
+        routes: [
+          GoRoute(
+            path: '/main',
+            builder: (context, state) => accountStatus
+                ? const MyHomePage(title: 'Flutter Demo Home Page')
+                : LoginScreen(),
+          ),
+          GoRoute(
+            path: '/signup',
+            name: 'signup',
+            builder: (context, state) => SignupScreen(),
+          )
+        ],
+      ),
+      // home: accountStatus
+      //     ? const MyHomePage(title: 'Flutter Demo Home Page')
+      //     : LoginScreen(),
     );
   }
 }

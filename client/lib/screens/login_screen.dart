@@ -1,5 +1,6 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:syiary_client/models/providers/user_info.dart';
@@ -103,7 +104,9 @@ class LoginScreen extends StatelessWidget {
                     try {
                       AuthenticateModel authentication =
                           await ApiService.getAuthentication(
-                              emailController.text, pwController.text);
+                        email: emailController.text,
+                        password: pwController.text,
+                      );
 
                       debugPrint('access: ${authentication.accessToken}');
                       debugPrint('refresh: ${authentication.refreshToken}');
@@ -153,7 +156,9 @@ class LoginScreen extends StatelessWidget {
                 width: itemWidth,
                 height: itemHeight,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    context.push('/signup');
+                  },
                   style: ButtonStyle(
                     shape: MaterialStateProperty.all(
                       RoundedRectangleBorder(
