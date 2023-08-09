@@ -1,8 +1,9 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:syiary_client/models/requests/authenticate_model/authenticate_model.dart';
+import 'package:syiary_client/models/response/authenticate_model/authenticate_model.dart';
 import 'package:syiary_client/services/api_services.dart';
 
 import '../models/providers/user_info.dart';
@@ -129,9 +130,10 @@ class SignupScreen extends StatelessWidget {
                             authentication.user!.email!;
 
                         // TODO 메인 페이지로 이동
+                        context.go('/group');
                       }
                     } catch (e) {
-                      Fluttertoast.showToast(msg: 'Email 혹은 Password가 틀렸습니다.');
+                      Fluttertoast.showToast(msg: '회원가입에 성공했으나, 로그인에 실패하였습니다.');
                     }
                   },
                   style: ButtonStyle(

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:syiary_client/models/requests/authenticate_model/authenticate_model.dart';
+import 'package:syiary_client/models/response/authenticate_model/authenticate_model.dart';
 
 class ApiService {
   static const String baseUrl = 'http://localhost:8080';

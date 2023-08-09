@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:syiary_client/models/providers/user_info.dart';
-import 'package:syiary_client/models/requests/authenticate_model/authenticate_model.dart';
+import 'package:syiary_client/models/response/authenticate_model/authenticate_model.dart';
 import 'package:syiary_client/services/api_services.dart';
 import 'package:syiary_client/widgets/logo_widget.dart';
 
@@ -122,7 +122,7 @@ class LoginScreen extends StatelessWidget {
                         context.read<UserInfo>().setEmail =
                             authentication.user!.email!;
 
-                        // TODO 메인 페이지로 이동
+                        context.go('/group');
                       }
                     } catch (e) {
                       Fluttertoast.showToast(msg: 'Email 혹은 Password가 틀렸습니다.');
