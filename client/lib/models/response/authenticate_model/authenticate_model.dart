@@ -1,9 +1,9 @@
-import 'user.dart';
+import 'user_model.dart';
 
 class AuthenticateModel {
   String? accessToken;
   String? refreshToken;
-  User? user;
+  UserModel? user;
 
   AuthenticateModel({this.accessToken, this.refreshToken, this.user});
 
@@ -13,7 +13,7 @@ class AuthenticateModel {
       refreshToken: json['refreshToken'] as String?,
       user: json['user'] == null
           ? null
-          : User.fromJson(json['user'] as Map<String, dynamic>),
+          : UserModel.fromJson(json['user'] as Map<String, dynamic>),
     );
   }
 

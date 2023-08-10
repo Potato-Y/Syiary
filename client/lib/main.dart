@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:syiary_client/models/providers/user_info.dart';
+import 'package:syiary_client/models/response/authenticate_model/user_model.dart';
+import 'package:syiary_client/screens/group_screen.dart';
 import 'package:syiary_client/screens/login_screen.dart';
 import 'package:syiary_client/screens/signup_screen.dart';
+import 'package:syiary_client/services/api_services.dart';
+import 'package:syiary_client/widgets/logo_widget.dart';
 
 void main(List<String> args) async {
   /// Android 플랫폼에서 상단 바를 투명하게 수정
@@ -39,17 +44,6 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final box = Hive.box('app');
-    bool accountStatus = false; // 계정 접근 상태를 나타냄
-    String? accessToken = box.get('accessToken');
-    String? refreshToken = box.get('refreshToken');
-
-    if (accessToken != null && refreshToken != null) {
-      /// db에 token 정보가 있을 경우 계정 정보가 있으므로 status를 true로 변경한다.
-      debugPrint('accessToken: $accessToken\nrefreshToken: $refreshToken');
-      accountStatus = true;
-    }
-
     return MaterialApp.router(
       title: 'Syiary',
       theme: ThemeData(
@@ -57,144 +51,116 @@ class App extends StatelessWidget {
         useMaterial3: true,
       ),
       routerConfig: GoRouter(
-        initialLocation: '/main',
+        initialLocation: '/',
         routes: [
           GoRoute(
-            path: '/main',
-            builder: (context, state) => accountStatus
-                ? const MyHomePage(title: 'Flutter Demo Home Page')
-                : LoginScreen(),
+            path: '/',
+            builder: (context, state) => const StartLoadScreen(),
           ),
+          GoRoute(
+            path: '/login',
+            name: 'login',
+            builder: (context, state) => LoginScreen(),
+          ),
+          // GoRoute(
+          //   path: '/main',
+          //   name: 'main',
+          //   builder: (context, state) =>
+          //       accountStatus ? const GroupScreen() : LoginScreen(),
+          // ),
           GoRoute(
             path: '/signup',
             name: 'signup',
             builder: (context, state) => SignupScreen(),
-          )
+          ),
+          GoRoute(
+            path: '/group',
+            name: 'group',
+            builder: (context, state) => const GroupScreen(),
+          ),
         ],
       ),
-      // home: accountStatus
-      //     ? const MyHomePage(title: 'Flutter Demo Home Page')
-      //     : LoginScreen(),
     );
   }
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+/// 앱이 실행됨에 필요한 기본적인 정보들을 불러온다.
+class StartLoadScreen extends StatelessWidget {
+  const StartLoadScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    final box = Hive.box('app');
+    bool accountStatus = false; // 계정 접근 상태를 나타냄
+
+    // db애서 token 정보 가져오기
+    String? accessToken = box.get('user_access_token');
+    String? refreshToken = box.get('user_refresh_token');
+
+    if (accessToken != null && refreshToken != null) {
+      /// db에 token 정보가 있을 경우 계정 정보가 있으므로 status를 true로 변경한다.
+      debugPrint('accessToken: $accessToken\nrefreshToken: $refreshToken');
+      accountStatus = true;
+    }
+
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      body: FutureBuilder(
+        future: _load(),
+        builder: (context, snapshot) {
+          // 계정 정보가 없는 경우 login 페이지로 이동한다.
+          if (accountStatus == false) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              context.go('/login');
+            });
+          }
+
+          // 받아온 데이터가 있는지 확인
+          if (snapshot.hasData) {
+            debugPrint('load screen data in.');
+            if (snapshot.data == null) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Fluttertoast.showToast(msg: '로그인에 실패하였습니다.');
+                context.go('/login');
+              });
+            }
+
+            // 데이터가 정상적으로 들어왔다고 판단되면 데이터 저장 후 group 화면으로 이동
+            UserModel user = snapshot.data!;
+
+            if (context.mounted) {
+              context.read<UserInfo>().setUserId = user.userId!;
+              context.read<UserInfo>().setEmail = user.email!;
+              context.read<UserInfo>().setNickName = user.nickname!;
+            }
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              context.go('/group');
+            });
+          }
+
+          // 로딩중 화면
+          return Center(
+            child: SizedBox(
+              width: 100,
+              height: 100,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: logo(),
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
+          );
+        },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Future<UserModel?> _load() async {
+    try {
+      UserModel user = await ApiService.getMyUserInfo();
+      return user;
+    } catch (e) {
+      debugPrint('_load error\n$e');
+      return null;
+    }
   }
 }

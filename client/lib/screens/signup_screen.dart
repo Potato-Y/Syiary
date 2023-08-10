@@ -120,10 +120,6 @@ class SignupScreen extends StatelessWidget {
                       );
 
                       if (context.mounted) {
-                        context.read<UserInfo>().setAccessToken =
-                            authentication.accessToken!;
-                        context.read<UserInfo>().setRefreshToken =
-                            authentication.refreshToken!;
                         context.read<UserInfo>().setUserId =
                             authentication.user!.userId!;
                         context.read<UserInfo>().setEmail =

@@ -1,11 +1,11 @@
-class User {
+class UserModel {
   int? userId;
   String? email;
   String? nickname;
 
-  User({this.userId, this.email, this.nickname});
+  UserModel({this.userId, this.email, this.nickname});
 
-  factory User.fromJson(Map<String, dynamic> json) => User(
+  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
         userId: json['userId'] as int?,
         email: json['email'] as String?,
         nickname: json['nickname'] as String?,
