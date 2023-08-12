@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:syiary_client/models/response/authenticate_model/authenticate_model.dart';
 import 'package:syiary_client/models/response/authenticate_model/user_model.dart';
+import 'package:syiary_client/models/response/create_group_model.dart';
 import 'package:syiary_client/models/response/token_reissue_model.dart';
 
 class ApiService {
@@ -16,7 +17,7 @@ class ApiService {
   /// 인증을 추가한 RestAPi 처리를 진행한다.
   /// 토큰이 만료된 경우 토큰을 다시 발급받고, 다시 요청한다.
   static Future<http.StreamedResponse> requestRestApi(String type, Uri url,
-      {JsonCodec? body}) async {
+      {Map<String, dynamic>? body}) async {
     final box = Hive.box('app');
 
     String accessToken = box.get('user_access_token');
@@ -53,7 +54,7 @@ class ApiService {
         box.delete('user_access_token');
         box.delete('user_refresh_token');
 
-        Fluttertoast.showToast(msg: '계정 정보를 불러올 수 없습니다.');
+        Fluttertoast.showToast(msg: '계정 정보를 불러올 수 없습니다.'); // TODO UI 영역으로 이동 필요
         throw Error();
       }
 
@@ -139,6 +140,22 @@ class ApiService {
       String body = await _getResponseBody(response);
       UserModel user = UserModel.fromJson(jsonDecode(body));
       return user;
+    }
+
+    throw Error();
+  }
+
+  /// 새로운 그룹을 생성한다.
+  static Future createGroup(String groupName) async {
+    var url = Uri.parse('$baseUrl/api/groups');
+    var body = {"groupName": groupName};
+    final http.StreamedResponse response =
+        await requestRestApi(_post, url, body: body);
+
+    if (response.statusCode == 201) {
+      String body = await _getResponseBody(response);
+      CreateGroupModel group = CreateGroupModel.fromJson(jsonDecode(body));
+      return group;
     }
 
     throw Error();

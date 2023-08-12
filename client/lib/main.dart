@@ -6,10 +6,13 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:syiary_client/models/providers/user_info.dart';
 import 'package:syiary_client/models/response/authenticate_model/user_model.dart';
+import 'package:syiary_client/screens/create_group_screen.dart';
 import 'package:syiary_client/screens/group_screen.dart';
+import 'package:syiary_client/screens/group_select_screen.dart';
 import 'package:syiary_client/screens/login_screen.dart';
 import 'package:syiary_client/screens/signup_screen.dart';
 import 'package:syiary_client/services/api_services.dart';
+import 'package:syiary_client/themes/app_original_color.dart';
 import 'package:syiary_client/widgets/logo_widget.dart';
 
 void main(List<String> args) async {
@@ -47,7 +50,14 @@ class App extends StatelessWidget {
     return MaterialApp.router(
       title: 'Syiary',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
+        // primarySwatch: createMaterialColor(const Color(0xFF8896AB)),
+        primarySwatch: appOriginalColor,
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF8896AB)),
+        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF8896AB)),
+        primaryColor: const Color.fromARGB(255, 136, 150, 171),
+        useMaterial3: true,
+      ),
+      darkTheme: ThemeData.dark().copyWith(
         useMaterial3: true,
       ),
       routerConfig: GoRouter(
@@ -62,12 +72,6 @@ class App extends StatelessWidget {
             name: 'login',
             builder: (context, state) => LoginScreen(),
           ),
-          // GoRoute(
-          //   path: '/main',
-          //   name: 'main',
-          //   builder: (context, state) =>
-          //       accountStatus ? const GroupScreen() : LoginScreen(),
-          // ),
           GoRoute(
             path: '/signup',
             name: 'signup',
@@ -75,8 +79,30 @@ class App extends StatelessWidget {
           ),
           GoRoute(
             path: '/group',
-            name: 'group',
-            builder: (context, state) => const GroupScreen(),
+            builder: (context, state) => const GroupSelectScreen(),
+            routes: [
+              GoRoute(
+                path: ':groupUri',
+                builder: (context, state) {
+                  if (state.pathParameters['groupUri'] == null) {
+                    return const CreateGroupSelectScreen();
+                  }
+                  return GroupScreen(
+                    groupUri: state.pathParameters['groupUri']!,
+                  );
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/group_select',
+            name: 'group_select',
+            builder: (context, state) => const GroupSelectScreen(),
+          ),
+          GoRoute(
+            path: '/create_group',
+            name: 'create_group',
+            builder: (context, state) => const CreateGroupSelectScreen(),
           ),
         ],
       ),
@@ -134,7 +160,7 @@ class StartLoadScreen extends StatelessWidget {
             }
 
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              context.go('/group');
+              context.go('/group_select');
             });
           }
 

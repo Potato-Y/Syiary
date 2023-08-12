@@ -23,7 +23,6 @@ class SignupScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Syiary 시작하기'),
       ),
       body: Center(

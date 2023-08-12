@@ -22,9 +22,6 @@ class LoginScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context)
-            .colorScheme
-            .inversePrimary, // TODO 추후 추가할 앱 색상에 맞춰 변경
         title: const Text('Syiary 시작하기'),
       ),
       body: Center(
