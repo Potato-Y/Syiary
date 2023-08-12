@@ -23,8 +23,7 @@ class _CreateGroupSelectScreenState extends State<CreateGroupSelectScreen> {
     const double itemHeight = 50;
 
     goGroupScreen(String groupUri) {
-      context.pushReplacement('/group/$groupUri');
-      // context.pushReplacement('/group');
+      context.pushReplacement('/groups/$groupUri');
     }
 
     return Scaffold(

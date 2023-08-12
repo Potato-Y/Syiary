@@ -78,7 +78,7 @@ class App extends StatelessWidget {
             builder: (context, state) => SignupScreen(),
           ),
           GoRoute(
-            path: '/group',
+            path: '/groups',
             builder: (context, state) => const GroupSelectScreen(),
             routes: [
               GoRoute(

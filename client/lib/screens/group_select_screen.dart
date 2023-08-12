@@ -26,7 +26,7 @@ class GroupSelectScreen extends StatelessWidget {
 
           return GestureDetector(
             onTap: () {
-              context.push('/group/${group.groupUri}');
+              context.push('/groups/${group.groupUri}');
             },
             child: Column(
               children: [
@@ -78,7 +78,7 @@ class GroupSelectScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     ElevatedButton.icon(
-                      onPressed: () => context.pushReplacement('/group'),
+                      onPressed: () => context.pushReplacement('/groups'),
                       icon: const Icon(Icons.refresh),
                       label: const Text('새로고침'),
                     ),
@@ -90,7 +90,7 @@ class GroupSelectScreen extends StatelessWidget {
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
                           return ElevatedButton(
-                            onPressed: () => context.pushReplacement('/group'),
+                            onPressed: () => context.pushReplacement('/groups'),
                             child: const Text('다시 불러오기'),
                           );
                         }

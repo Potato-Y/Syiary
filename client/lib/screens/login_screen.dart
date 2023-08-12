@@ -123,7 +123,7 @@ class LoginScreen extends StatelessWidget {
                         context.read<UserInfo>().setNickName =
                             authentication.user!.nickname!;
 
-                        context.go('/group');
+                        context.go('/groups');
                       }
                     } catch (e) {
                       Fluttertoast.showToast(msg: 'Email 혹은 Password가 틀렸습니다.');

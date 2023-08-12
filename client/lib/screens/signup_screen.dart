@@ -124,8 +124,7 @@ class SignupScreen extends StatelessWidget {
                         context.read<UserInfo>().setEmail =
                             authentication.user!.email!;
 
-                        // TODO 메인 페이지로 이동
-                        context.go('/group');
+                        context.go('/groups');
                       }
                     } catch (e) {
                       Fluttertoast.showToast(msg: '회원가입에 성공했으나, 로그인에 실패하였습니다.');
