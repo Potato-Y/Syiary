@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:syiary_client/models/response/authenticate_model/authenticate_model.dart';
 import 'package:syiary_client/models/response/authenticate_model/user_model.dart';
 import 'package:syiary_client/models/response/create_group_model.dart';
+import 'package:syiary_client/models/response/group_list_model.dart';
 import 'package:syiary_client/models/response/token_reissue_model.dart';
 
 class ApiService {
@@ -156,6 +157,23 @@ class ApiService {
       String body = await _getResponseBody(response);
       CreateGroupModel group = CreateGroupModel.fromJson(jsonDecode(body));
       return group;
+    }
+
+    throw Error();
+  }
+
+  /// 그룹 목록을 가져온다.
+  static Future<List<GroupListModel>> getGroupList() async {
+    var url = Uri.parse('$baseUrl/api/groups');
+    final http.StreamedResponse response = await requestRestApi(_get, url);
+
+    if (response.statusCode == 200) {
+      String body = await _getResponseBody(response);
+      List<dynamic> jsonList = jsonDecode(body);
+      List<GroupListModel> groups =
+          jsonList.map((json) => GroupListModel.fromJson(json)).toList();
+
+      return groups;
     }
 
     throw Error();

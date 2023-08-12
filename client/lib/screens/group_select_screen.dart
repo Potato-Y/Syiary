@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
+import 'package:syiary_client/services/api_services.dart';
 import 'package:syiary_client/themes/app_original_color.dart';
+
+import '../models/response/group_list_model.dart';
 
 class GroupSelectScreen extends StatelessWidget {
   const GroupSelectScreen({super.key});
@@ -9,6 +13,48 @@ class GroupSelectScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final double itemWidth = MediaQuery.of(context).size.width * 0.9;
     const double itemHeight = 50;
+
+    ListView makeList(AsyncSnapshot<List<GroupListModel>?> snapshot) {
+      return ListView.separated(
+        scrollDirection: Axis.vertical,
+        itemCount: snapshot.data!.length,
+        itemBuilder: (context, index) {
+          if (snapshot.data == null) {
+            return ListView();
+          }
+          var group = snapshot.data![index];
+
+          return GestureDetector(
+            onTap: () {
+              context.push('/group/${group.groupUri}');
+            },
+            child: Column(
+              children: [
+                Container(
+                  width: itemWidth - 10,
+                  height: itemHeight,
+                  // margin: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: appOriginalColor.shade100,
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(10),
+                    ),
+                  ),
+                  child: Text(
+                    group.groupName!,
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+        separatorBuilder: (context, index) => const SizedBox(
+          height: 10,
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -23,6 +69,7 @@ class GroupSelectScreen extends StatelessWidget {
               ),
               Container(
                 width: itemWidth,
+                height: MediaQuery.of(context).size.width * 0.6,
                 padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -30,37 +77,32 @@ class GroupSelectScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
+                    ElevatedButton.icon(
+                      onPressed: () => context.pushReplacement('/group'),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('새로고침'),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
                     FutureBuilder(
                       future: _loadGroup(),
                       builder: (context, snapshot) {
-                        return Column(
-                          children: [
-                            GestureDetector(
-                              onTap: () {},
-                              child: Column(
-                                children: [
-                                  Container(
-                                    width: itemWidth - 10,
-                                    height: itemHeight,
-                                    margin:
-                                        const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: appOriginalColor.shade100,
-                                      borderRadius: const BorderRadius.all(
-                                        Radius.circular(10),
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      '그룹 이름',
-                                      style: TextStyle(fontSize: 20),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        );
+                        if (snapshot.hasError) {
+                          return ElevatedButton(
+                            onPressed: () => context.pushReplacement('/group'),
+                            child: const Text('다시 불러오기'),
+                          );
+                        }
+
+                        if (snapshot.hasData) {
+                          if (snapshot.data!.isEmpty) {
+                            return const Text('참여한 그룹 정보가 없습니다.');
+                          }
+                          return Expanded(child: makeList(snapshot));
+                        }
+
+                        return const CircularProgressIndicator();
                       },
                     ),
                   ],
@@ -86,5 +128,14 @@ class GroupSelectScreen extends StatelessWidget {
     );
   }
 
-  Future _loadGroup() async {}
+  Future<List<GroupListModel>?> _loadGroup() async {
+    try {
+      List<GroupListModel> groups = await ApiService.getGroupList();
+      // return null;
+      return groups;
+    } catch (e) {
+      Fluttertoast.showToast(msg: '최신 정보를 불러올 수 없습니다.');
+      return null;
+    }
+  }
 }
