@@ -129,9 +129,21 @@ class StartLoadScreen extends StatelessWidget {
       accountStatus = true;
     }
 
+    Future<UserModel?> load() async {
+      try {
+        UserModel user = await ApiService.getMyUserInfo();
+        return user;
+      } catch (e) {
+        debugPrint('_load error\n$e');
+        Fluttertoast.showToast(msg: '사용자 정보를 가져올 수 없습니다.');
+        context.go('/login');
+        return null;
+      }
+    }
+
     return Scaffold(
       body: FutureBuilder(
-        future: _load(),
+        future: load(),
         builder: (context, snapshot) {
           // 계정 정보가 없는 경우 login 페이지로 이동한다.
           if (accountStatus == false) {
@@ -178,15 +190,5 @@ class StartLoadScreen extends StatelessWidget {
         },
       ),
     );
-  }
-
-  Future<UserModel?> _load() async {
-    try {
-      UserModel user = await ApiService.getMyUserInfo();
-      return user;
-    } catch (e) {
-      debugPrint('_load error\n$e');
-      return null;
-    }
   }
 }
