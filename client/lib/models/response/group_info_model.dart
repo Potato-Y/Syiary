@@ -1,15 +1,17 @@
-class GroupListModel {
+class GroupInfoModel {
   int? id;
   String? groupUri;
   String? groupName;
+  String? createAt;
 
-  GroupListModel({this.id, this.groupUri, this.groupName});
+  GroupInfoModel({this.id, this.groupUri, this.groupName, this.createAt});
 
-  factory GroupListModel.fromJson(Map<String, dynamic> json) {
-    return GroupListModel(
+  factory GroupInfoModel.fromJson(Map<String, dynamic> json) {
+    return GroupInfoModel(
       id: json['id'] as int?,
       groupUri: json['groupUri'] as String?,
       groupName: json['groupName'] as String?,
+      createAt: json['createAt'] as String?,
     );
   }
 
@@ -17,5 +19,6 @@ class GroupListModel {
         'id': id,
         'groupUri': groupUri,
         'groupName': groupName,
+        'createAt': createAt,
       };
 }

@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:syiary_client/services/api_services.dart';
 import 'package:syiary_client/themes/app_original_color.dart';
 
-import '../models/response/group_list_model.dart';
+import '../models/response/group_info_model.dart';
 
 class GroupSelectScreen extends StatelessWidget {
   const GroupSelectScreen({super.key});
@@ -14,7 +14,7 @@ class GroupSelectScreen extends StatelessWidget {
     final double itemWidth = MediaQuery.of(context).size.width * 0.9;
     const double itemHeight = 50;
 
-    ListView makeList(AsyncSnapshot<List<GroupListModel>?> snapshot) {
+    ListView makeList(AsyncSnapshot<List<GroupInfoModel>?> snapshot) {
       return ListView.separated(
         scrollDirection: Axis.vertical,
         itemCount: snapshot.data!.length,
@@ -128,9 +128,9 @@ class GroupSelectScreen extends StatelessWidget {
     );
   }
 
-  Future<List<GroupListModel>?> _loadGroup() async {
+  Future<List<GroupInfoModel>?> _loadGroup() async {
     try {
-      List<GroupListModel> groups = await ApiService.getGroupList();
+      List<GroupInfoModel> groups = await ApiService.getGroupList();
       // return null;
       return groups;
     } catch (e) {
