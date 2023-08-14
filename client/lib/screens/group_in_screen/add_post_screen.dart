@@ -9,8 +9,10 @@ import '../../themes/app_original_color.dart';
 
 class AddPostScreen extends StatefulWidget {
   final String groupUri;
+  final Function goChangePage;
 
-  const AddPostScreen({super.key, required this.groupUri});
+  const AddPostScreen(
+      {super.key, required this.groupUri, required this.goChangePage});
 
   @override
   State<AddPostScreen> createState() => AddPostScreenState();
@@ -144,7 +146,8 @@ class AddPostScreenState extends State<AddPostScreen> {
                           content: _textEditingController.text,
                           files: nonNullImages);
 
-                      Fluttertoast.showToast(msg: '전송에 성공하였습니다.');
+                      Fluttertoast.showToast(msg: '업로드하였습니다.');
+                      widget.goChangePage(0);
                       resetScreen();
                     } catch (e) {
                       Fluttertoast.showToast(msg: '업로드에 실패하였습니다.');

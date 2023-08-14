@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:syiary_client/models/providers/user_info.dart';
 import 'package:syiary_client/models/response/authenticate_model/user_model.dart';
 import 'package:syiary_client/screens/create_group_screen.dart';
-import 'package:syiary_client/screens/group_screen.dart';
+import 'package:syiary_client/screens/group_in_screen/group_screen.dart';
 import 'package:syiary_client/screens/group_select_screen.dart';
 import 'package:syiary_client/screens/login_screen.dart';
 import 'package:syiary_client/screens/signup_screen.dart';
