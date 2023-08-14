@@ -60,6 +60,11 @@ class _CreateGroupSelectScreenState extends State<CreateGroupSelectScreen> {
                   onPressed: _loading
                       ? null
                       : () async {
+                          if (_groupNameController.text == '') {
+                            Fluttertoast.showToast(msg: '그룹 이름이 비어있습니다.');
+                            return;
+                          }
+
                           setState(() {
                             _loading = true;
                           });
@@ -72,6 +77,9 @@ class _CreateGroupSelectScreenState extends State<CreateGroupSelectScreen> {
                             goGroupScreen(group.groupUri!);
                           } catch (e) {
                             Fluttertoast.showToast(msg: '그룹을 만드는데 실패하였습니다.');
+                            setState(() {
+                              _loading = false;
+                            });
                           }
                         },
                   child: _loading
