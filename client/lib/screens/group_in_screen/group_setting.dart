@@ -1,6 +1,9 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:syiary_client/models/providers/user_info.dart';
 
 import '../../models/response/group_info_model.dart';
 import '../../services/api_services.dart';
@@ -47,9 +50,25 @@ class GroupSetting extends StatelessWidget {
                     width: 10,
                   ),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      if (!EmailValidator.validate(
+                          _emailTextEditingController.text)) {
+                        Fluttertoast.showToast(msg: 'Email이 아닙니다.');
+                        return;
+                      }
+
+                      try {
+                        await ApiService.signupMemberGroup(groupUri,
+                            email: _emailTextEditingController.text);
+                        Fluttertoast.showToast(msg: '사용자를 추가하였습니다.');
+                        _emailTextEditingController.text = '';
+                      } catch (e) {
+                        debugPrint(e.toString());
+                        Fluttertoast.showToast(msg: '사용자를 추가할 수 없습니다.');
+                      }
+                    },
                     child: const Text('추가'),
-                  )
+                  ),
                 ],
               ),
               const SettingTitle('사용자 제거'),
@@ -104,6 +123,23 @@ class _DeleteGroupContainerState extends State<DeleteGroupContainer> {
       future: _loadGroup(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
+          // host가 아닌 경우 방 나가기 반환
+          if (snapshot.data!.hostUser!.email !=
+              context.read<UserInfo>().email) {
+            return FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: Colors.red[200],
+              ),
+              child: const Text(
+                '방 나가기',
+                style: TextStyle(
+                  color: Colors.black,
+                ),
+              ),
+              onPressed: () {},
+            );
+          }
+
           final String groupName = snapshot.data!.groupName!;
 
           return Column(

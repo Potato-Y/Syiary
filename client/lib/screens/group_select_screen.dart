@@ -131,7 +131,6 @@ class GroupSelectScreen extends StatelessWidget {
   Future<List<GroupInfoModel>?> _loadGroup() async {
     try {
       List<GroupInfoModel> groups = await ApiService.getGroupList();
-      // return null;
       return groups;
     } catch (e) {
       Fluttertoast.showToast(msg: '최신 정보를 불러올 수 없습니다.');

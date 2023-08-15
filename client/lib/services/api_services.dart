@@ -290,6 +290,22 @@ class ApiService {
     await requestForm(_post, url, body: body);
   }
 
+  /// 새로운 사용자를 추가한다.
+  static Future signupMemberGroup(String groupUri,
+      {required String? email}) async {
+    var url = Uri.parse('$baseUrl/api/groups/$groupUri/members');
+    var body = {'userEmail': email ?? ''};
+    final http.StreamedResponse response = await requestRestApi(
+      _post,
+      url,
+      body: body,
+    );
+
+    if (response.statusCode != 204) {
+      throw Error();
+    }
+  }
+
   static Future deleteGroup(String groupUri, String groupSign) async {
     var url = Uri.parse('$baseUrl/api/groups/$groupUri');
     var body = {"groupNameSign": groupSign};
