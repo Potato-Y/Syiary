@@ -1,28 +1,21 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:mime/mime.dart';
-import 'package:syiary_client/models/response/authenticate_model/authenticate_model.dart';
-import 'package:syiary_client/models/response/authenticate_model/user_model.dart';
-import 'package:syiary_client/models/response/create_group_model.dart';
-import 'package:syiary_client/models/response/group_info_model.dart';
+import 'package:syiary_client/enum/request_method.dart';
 import 'package:syiary_client/models/response/token_reissue_model.dart';
 
-class ApiService {
-  static const String baseUrl = 'http://localhost:8080';
-  static const String _post = 'POST';
-  static const String _get = 'GET';
-  static const String _delete = 'DELETE';
+class ApiBase {
+  final String baseUrl = 'http://localhost:8080';
+
+  ApiBase();
 
   /// 인증을 추가한 RestAPi 처리를 진행한다.
   /// 토큰이 만료된 경우 토큰을 다시 발급받고, 다시 요청한다.
-  static Future<http.StreamedResponse> requestRestApi(String type, Uri url,
+  Future<http.StreamedResponse> requestRestApi(RequestMethod method, Uri url,
       {Map<String, dynamic>? body}) async {
     final box = Hive.box('app');
 
@@ -35,7 +28,7 @@ class ApiService {
         'Authorization': 'Bearer $accessToken'
       };
 
-      final req = http.Request(type, url);
+      final req = http.Request(method.value, url);
       req.headers.addAll(headers);
       if (body != null) {
         req.body = json.encode(body);
@@ -49,7 +42,7 @@ class ApiService {
     var response = await request();
 
     // 토큰의 기간이 만료된 것으로 예상될 경우 다시 발급받는다.
-    if (response.statusCode == 403) {
+    if (response.statusCode == HttpStatus.forbidden) {
       try {
         // 토큰을 새로 발급받는다.
         TokenReissueModel token = await tokenReissue(accessToken, refreshToken);
@@ -69,7 +62,7 @@ class ApiService {
     }
 
     // 문제가 없을 경우 response를 반환한다.
-    if (response.statusCode != 403) {
+    if (response.statusCode != HttpStatus.forbidden) {
       return response;
     }
 
@@ -78,7 +71,7 @@ class ApiService {
   }
 
   /// form-data 방식의 요청을 한다.
-  static Future requestForm(String type, String url,
+  Future requestForm(RequestMethod method, String url,
       {Map<String, dynamic>? body}) async {
     final box = Hive.box('app');
 
@@ -101,7 +94,7 @@ class ApiService {
       var response = await dio.request(
         url,
         options: Options(
-          method: type,
+          method: method.value,
           headers: headers,
         ),
         data: data,
@@ -113,7 +106,7 @@ class ApiService {
     // 받은 정보를 통해 요청한다.
     var response = await request();
 
-    if (response.statusCode == 403) {
+    if (response.statusCode == HttpStatus.forbidden) {
       try {
         // 토큰을 새로 발급받는다.
         TokenReissueModel token = await tokenReissue(accessToken, refreshToken);
@@ -133,7 +126,7 @@ class ApiService {
     }
 
     // 문제가 없을 경우 response를 반환한다.
-    if (response.statusCode != 403) {
+    if (response.statusCode != HttpStatus.forbidden) {
       return response;
     }
 
@@ -142,7 +135,7 @@ class ApiService {
   }
 
   /// 새로운 토큰을 발급 받는다.
-  static Future<TokenReissueModel> tokenReissue(
+  Future<TokenReissueModel> tokenReissue(
       String accessToken, String refreshToken) async {
     final url = Uri.parse('$baseUrl/api/token');
     Map<String, String> headers = {'Content-Type': 'application/json'};
@@ -159,165 +152,7 @@ class ApiService {
     throw Error();
   }
 
-  static Future<AuthenticateModel> getAuthentication(
-      {required String email, required String password}) async {
-    final url = Uri.parse('$baseUrl/api/authenticate');
-    Map<String, String> headers = {'Content-Type': 'application/json'};
-    var body = {"email": email, "password": password};
-
-    final response =
-        await http.post(url, headers: headers, body: json.encode(body));
-
-    debugPrint('code: ${response.statusCode}');
-
-    if (response.statusCode == 200) {
-      final dynamic body = jsonDecode(response.body);
-      AuthenticateModel model = AuthenticateModel.fromJson(body);
-
-      return model;
-    }
-
-    throw Error();
-  }
-
-  static Future<void> signup(
-      String email, String password, String nickname) async {
-    final url = Uri.parse('$baseUrl/api/signup');
-    Map<String, String> headers = {'Content-Type': 'application/json'};
-    var body = {"email": email, "password": password, "nickname": nickname};
-
-    final response = await http.post(
-      url,
-      headers: headers,
-      body: json.encode(body),
-    );
-
-    debugPrint('signup. code: ${response.statusCode}');
-
-    if (response.statusCode == 201) {
-      return;
-    }
-
-    throw Error();
-  }
-
-  /// 유저 정보를 발급받는다.
-  static Future<UserModel> getMyUserInfo() async {
-    var url = Uri.parse('$baseUrl/api/user');
-    final http.StreamedResponse response = await requestRestApi(_get, url);
-
-    if (response.statusCode == 200) {
-      String body = await _getResponseBody(response);
-      UserModel user = UserModel.fromJson(jsonDecode(body));
-      return user;
-    }
-
-    throw Error();
-  }
-
-  /// 새로운 그룹을 생성한다.
-  static Future<CreateGroupModel> createGroup(String groupName) async {
-    var url = Uri.parse('$baseUrl/api/groups');
-    var body = {"groupName": groupName};
-    final http.StreamedResponse response =
-        await requestRestApi(_post, url, body: body);
-
-    if (response.statusCode == 201) {
-      String body = await _getResponseBody(response);
-      CreateGroupModel group = CreateGroupModel.fromJson(jsonDecode(body));
-      return group;
-    }
-
-    throw Error();
-  }
-
-  /// 그룹 목록을 가져온다.
-  static Future<List<GroupInfoModel>> getGroupList() async {
-    var url = Uri.parse('$baseUrl/api/groups');
-    final http.StreamedResponse response = await requestRestApi(_get, url);
-
-    if (response.statusCode == 200) {
-      String body = await _getResponseBody(response);
-      List<dynamic> jsonList = jsonDecode(body);
-      List<GroupInfoModel> groups =
-          jsonList.map((json) => GroupInfoModel.fromJson(json)).toList();
-
-      return groups;
-    }
-
-    throw Error();
-  }
-
-  /// 그룹 정보 불러오기
-  static Future<GroupInfoModel> getGroupInfo(String groupUri) async {
-    var url = Uri.parse('$baseUrl/api/groups/$groupUri');
-    final http.StreamedResponse response = await requestRestApi(_get, url);
-
-    if (response.statusCode == 200) {
-      String body = await _getResponseBody(response);
-      GroupInfoModel group = GroupInfoModel.fromJson(jsonDecode(body));
-
-      return group;
-    }
-
-    throw Error();
-  }
-
-  /// 새로운 게시글 전송
-  static Future uploadPost(String groupUri,
-      {String? content, List<XFile>? files}) async {
-    var url = '$baseUrl/api/groups/$groupUri/posts';
-
-    // 받아온 파일을 업로드하기 위해 가공한다.
-    List<MultipartFile> multipartFiles = [];
-    if (files != null) {
-      multipartFiles = files.map((file) {
-        String? type = lookupMimeType(file.name);
-        if (type == null) {
-          throw Error();
-        }
-        return MultipartFile.fromFileSync(file.path,
-            contentType: MediaType.parse(type));
-      }).toList();
-    }
-
-    // 전송할 정보를 포함시킨다.
-    Map<String, dynamic> body = {
-      'content': content ?? '',
-      'files': multipartFiles
-    };
-
-    await requestForm(_post, url, body: body);
-  }
-
-  /// 새로운 사용자를 추가한다.
-  static Future signupMemberGroup(String groupUri,
-      {required String? email}) async {
-    var url = Uri.parse('$baseUrl/api/groups/$groupUri/members');
-    var body = {'userEmail': email ?? ''};
-    final http.StreamedResponse response = await requestRestApi(
-      _post,
-      url,
-      body: body,
-    );
-
-    if (response.statusCode != 204) {
-      throw Error();
-    }
-  }
-
-  static Future deleteGroup(String groupUri, String groupSign) async {
-    var url = Uri.parse('$baseUrl/api/groups/$groupUri');
-    var body = {"groupNameSign": groupSign};
-    final http.StreamedResponse response =
-        await requestRestApi(_delete, url, body: body);
-
-    if (response.statusCode != 204) {
-      throw Error();
-    }
-  }
-
-  static Future<String> _getResponseBody(http.StreamedResponse response) async {
+  Future<String> getResponseBody(http.StreamedResponse response) async {
     return await response.stream.bytesToString();
   }
 }
