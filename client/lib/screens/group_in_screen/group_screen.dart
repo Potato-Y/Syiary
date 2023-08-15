@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
 import 'package:syiary_client/models/response/group_info_model.dart';
 import 'package:syiary_client/services/api_services.dart';
 
@@ -30,6 +31,17 @@ class GroupScreen extends StatelessWidget {
           return Scaffold(
             appBar: AppBar(
               title: Text(snapshot.data!.groupName!),
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    context.push('/groups/$groupUri/settings');
+                  },
+                  tooltip: 'Setting',
+                  icon: const Icon(
+                    Icons.settings,
+                  ),
+                ),
+              ],
             ),
             body: GroupBodyScreen(
               groupUri: groupUri,
@@ -65,13 +77,13 @@ class _GroupBodyScreenState extends State<GroupBodyScreen> {
   void _onTab(int index) {
     _pageController.animateToPage(
       index,
-      duration: const Duration(microseconds: 350),
+      duration: const Duration(milliseconds: 350),
       curve: Curves.easeIn,
     );
   }
 
   /// 해당 페이지로 변경
-  void onPageChanged(int index) {
+  void _onPageChanged(int index) {
     setState(() {
       _currentIndex = index;
     });
@@ -82,7 +94,7 @@ class _GroupBodyScreenState extends State<GroupBodyScreen> {
     return Scaffold(
       body: PageView(
         controller: _pageController,
-        onPageChanged: onPageChanged,
+        onPageChanged: _onPageChanged,
         children: [
           // feed
           Container(

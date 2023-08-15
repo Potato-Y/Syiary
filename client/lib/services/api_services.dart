@@ -18,6 +18,7 @@ class ApiService {
   static const String baseUrl = 'http://localhost:8080';
   static const String _post = 'POST';
   static const String _get = 'GET';
+  static const String _delete = 'DELETE';
 
   /// 인증을 추가한 RestAPi 처리를 진행한다.
   /// 토큰이 만료된 경우 토큰을 다시 발급받고, 다시 요청한다.
@@ -287,6 +288,17 @@ class ApiService {
     };
 
     await requestForm(_post, url, body: body);
+  }
+
+  static Future deleteGroup(String groupUri, String groupSign) async {
+    var url = Uri.parse('$baseUrl/api/groups/$groupUri');
+    var body = {"groupNameSign": groupSign};
+    final http.StreamedResponse response =
+        await requestRestApi(_delete, url, body: body);
+
+    if (response.statusCode != 204) {
+      throw Error();
+    }
   }
 
   static Future<String> _getResponseBody(http.StreamedResponse response) async {

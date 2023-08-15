@@ -8,6 +8,7 @@ import 'package:syiary_client/models/providers/user_info.dart';
 import 'package:syiary_client/models/response/authenticate_model/user_model.dart';
 import 'package:syiary_client/screens/create_group_screen.dart';
 import 'package:syiary_client/screens/group_in_screen/group_screen.dart';
+import 'package:syiary_client/screens/group_in_screen/group_setting.dart';
 import 'package:syiary_client/screens/group_select_screen.dart';
 import 'package:syiary_client/screens/login_screen.dart';
 import 'package:syiary_client/screens/signup_screen.dart';
@@ -82,16 +83,25 @@ class App extends StatelessWidget {
             builder: (context, state) => const GroupSelectScreen(),
             routes: [
               GoRoute(
-                path: ':groupUri',
-                builder: (context, state) {
-                  if (state.pathParameters['groupUri'] == null) {
-                    return const CreateGroupSelectScreen();
-                  }
-                  return GroupScreen(
-                    groupUri: state.pathParameters['groupUri']!,
-                  );
-                },
-              ),
+                  path: ':groupUri',
+                  builder: (context, state) {
+                    if (state.pathParameters['groupUri'] == null) {
+                      return const CreateGroupSelectScreen();
+                    }
+                    return GroupScreen(
+                      groupUri: state.pathParameters['groupUri']!,
+                    );
+                  },
+                  routes: [
+                    GoRoute(
+                      path: 'settings',
+                      builder: (context, state) {
+                        return GroupSetting(
+                          groupUri: state.pathParameters['groupUri']!,
+                        );
+                      },
+                    )
+                  ]),
             ],
           ),
           GoRoute(
