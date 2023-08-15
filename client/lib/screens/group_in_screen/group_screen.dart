@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
+import 'package:syiary_client/exception/account_exception.dart';
+import 'package:syiary_client/exception/group_exception.dart';
 import 'package:syiary_client/models/response/group_info_model.dart';
-import 'package:syiary_client/services/api_services.dart';
+import 'package:syiary_client/services/group/group_api_service.dart';
 
+import '../../exception/response_exception.dart';
 import 'add_post_screen.dart';
 
 class GroupScreen extends StatelessWidget {
@@ -11,14 +14,18 @@ class GroupScreen extends StatelessWidget {
 
   const GroupScreen({super.key, required this.groupUri});
 
-  Future<GroupInfoModel> _loadGroup() async {
+  Future<GroupInfoModel?> _loadGroup() async {
     try {
-      GroupInfoModel group = await ApiService.getGroupInfo(groupUri);
+      GroupInfoModel group = await GroupApiService().getGroupInfo(groupUri);
       return group;
-    } catch (e) {
-      Fluttertoast.showToast(msg: '그룹 정보를 불러오지 못 하였습니다.');
-      throw Error();
+    } on GroupException catch (e) {
+      Fluttertoast.showToast(msg: e.message);
+    } on AccountException catch (e) {
+      Fluttertoast.showToast(msg: e.message);
+    } on ResponseException catch (e) {
+      Fluttertoast.showToast(msg: e.message);
     }
+    return null;
   }
 
   @override

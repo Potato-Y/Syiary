@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:syiary_client/enum/request_method.dart';
+import 'package:syiary_client/exception/post_exception.dart';
 
 import '../api_base.dart';
 
@@ -33,6 +36,10 @@ class PostApiService extends ApiBase {
       'files': multipartFiles
     };
 
-    await requestForm(RequestMethod.post, url, body: body);
+    Response response = await requestForm(RequestMethod.post, url, body: body);
+
+    if (response.statusCode != HttpStatus.created) {
+      throw PostException('업로드에 실패하였습니다.');
+    }
   }
 }

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:syiary_client/enum/request_method.dart';
+import 'package:syiary_client/exception/account_exception.dart';
 
 import '../../models/response/authenticate_model/authenticate_model.dart';
 import '../../models/response/authenticate_model/user_model.dart';
@@ -12,6 +13,7 @@ import '../api_base.dart';
 class AccountApiService extends ApiBase {
   AccountApiService() : super();
 
+  /// 로그인한다.
   Future<AuthenticateModel> getAuthentication(
       {required String email, required String password}) async {
     final url = Uri.parse('$baseUrl/api/authenticate');
@@ -30,9 +32,10 @@ class AccountApiService extends ApiBase {
       return model;
     }
 
-    throw Error();
+    throw AccountException('로그인에 실패하였습니다.');
   }
 
+  /// 회원가입한다.
   Future<void> signup(String email, String password, String nickname) async {
     final url = Uri.parse('$baseUrl/api/signup');
     Map<String, String> headers = {'Content-Type': 'application/json'};
@@ -50,7 +53,7 @@ class AccountApiService extends ApiBase {
       return;
     }
 
-    throw Error();
+    throw AccountException('회원가입에 실패하였습니다.');
   }
 
   /// 유저 정보를 발급받는다.
@@ -65,6 +68,6 @@ class AccountApiService extends ApiBase {
       return user;
     }
 
-    throw Error();
+    throw AccountException('계정 정보를 불러올 수 없습니다.');
   }
 }

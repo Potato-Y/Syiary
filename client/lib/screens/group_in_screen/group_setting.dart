@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:syiary_client/exception/group_exception.dart';
 import 'package:syiary_client/models/providers/user_info.dart';
+import 'package:syiary_client/services/group/group_api_service.dart';
 
+import '../../exception/account_exception.dart';
+import '../../exception/response_exception.dart';
 import '../../models/response/group_info_model.dart';
-import '../../services/api_services.dart';
 
 class GroupSetting extends StatelessWidget {
   final String groupUri;
@@ -17,7 +20,7 @@ class GroupSetting extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double itemWidth = MediaQuery.of(context).size.width * 0.8;
+    // final double itemWidth = MediaQuery.of(context).size.width * 0.8;
     const double itemHeight = 50;
 
     return Scaffold(
@@ -58,13 +61,20 @@ class GroupSetting extends StatelessWidget {
                       }
 
                       try {
-                        await ApiService.signupMemberGroup(groupUri,
+                        await GroupApiService().signupMemberGroup(groupUri,
                             email: _emailTextEditingController.text);
                         Fluttertoast.showToast(msg: '사용자를 추가하였습니다.');
                         _emailTextEditingController.text = '';
+                      } on GroupException catch (e) {
+                        Fluttertoast.showToast(msg: e.message);
+                      } on AccountException catch (e) {
+                        Fluttertoast.showToast(msg: e.message);
+                        context.go('/login');
+                      } on ResponseException catch (e) {
+                        Fluttertoast.showToast(msg: e.message);
                       } catch (e) {
                         debugPrint(e.toString());
-                        Fluttertoast.showToast(msg: '사용자를 추가할 수 없습니다.');
+                        Fluttertoast.showToast(msg: '오류가 발생했습니다.');
                       }
                     },
                     child: const Text('추가'),
@@ -105,14 +115,23 @@ class DeleteGroupContainer extends StatefulWidget {
 class _DeleteGroupContainerState extends State<DeleteGroupContainer> {
   final TextEditingController _textEditingController = TextEditingController();
 
-  Future<GroupInfoModel> _loadGroup() async {
+  Future<GroupInfoModel?> _loadGroup() async {
     try {
-      GroupInfoModel group = await ApiService.getGroupInfo(widget.groupUri);
+      GroupInfoModel group =
+          await GroupApiService().getGroupInfo(widget.groupUri);
       return group;
+    } on GroupException catch (e) {
+      Fluttertoast.showToast(msg: e.message);
+    } on AccountException catch (e) {
+      Fluttertoast.showToast(msg: e.message);
+      context.go('/login');
+    } on ResponseException catch (e) {
+      Fluttertoast.showToast(msg: e.message);
     } catch (e) {
-      Fluttertoast.showToast(msg: '그룹 정보를 불러오지 못 하였습니다.');
-      throw Error();
+      debugPrint(e.toString());
+      Fluttertoast.showToast(msg: '오류가 발생했습니다.');
     }
+    return null;
   }
 
   @override
@@ -176,12 +195,20 @@ class _DeleteGroupContainerState extends State<DeleteGroupContainer> {
                   }
 
                   try {
-                    ApiService.deleteGroup(
+                    GroupApiService().deleteGroup(
                         widget.groupUri, _textEditingController.text);
 
                     context.go('/');
+                  } on GroupException catch (e) {
+                    Fluttertoast.showToast(msg: e.message);
+                  } on AccountException catch (e) {
+                    Fluttertoast.showToast(msg: e.message);
+                    context.go('/login');
+                  } on ResponseException catch (e) {
+                    Fluttertoast.showToast(msg: e.message);
                   } catch (e) {
-                    Fluttertoast.showToast(msg: '그룹 삭제에 실패하였습니다.');
+                    debugPrint(e.toString());
+                    Fluttertoast.showToast(msg: '오류가 발생했습니다.');
                   }
                 },
               )

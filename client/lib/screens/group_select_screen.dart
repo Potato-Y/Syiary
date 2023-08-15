@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
-import 'package:syiary_client/services/api_services.dart';
+import 'package:syiary_client/services/group/group_api_service.dart';
 import 'package:syiary_client/themes/app_original_color.dart';
 
+import '../exception/account_exception.dart';
+import '../exception/group_exception.dart';
+import '../exception/response_exception.dart';
 import '../models/response/group_info_model.dart';
 
 class GroupSelectScreen extends StatelessWidget {
@@ -130,11 +133,18 @@ class GroupSelectScreen extends StatelessWidget {
 
   Future<List<GroupInfoModel>?> _loadGroup() async {
     try {
-      List<GroupInfoModel> groups = await ApiService.getGroupList();
+      List<GroupInfoModel> groups = await GroupApiService().getGroupList();
       return groups;
+    } on GroupException catch (e) {
+      Fluttertoast.showToast(msg: e.message);
+    } on AccountException catch (e) {
+      Fluttertoast.showToast(msg: e.message);
+    } on ResponseException catch (e) {
+      Fluttertoast.showToast(msg: e.message);
     } catch (e) {
-      Fluttertoast.showToast(msg: '최신 정보를 불러올 수 없습니다.');
-      return null;
+      debugPrint(e.toString());
+      Fluttertoast.showToast(msg: '오류가 발생했습니다.');
     }
+    return null;
   }
 }

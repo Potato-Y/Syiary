@@ -4,7 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:syiary_client/models/response/authenticate_model/authenticate_model.dart';
-import 'package:syiary_client/services/api_services.dart';
+import 'package:syiary_client/services/group/account_api_service.dart';
 
 import '../models/providers/user_info.dart';
 
@@ -98,7 +98,7 @@ class SignupScreen extends StatelessWidget {
                     }
 
                     try {
-                      await ApiService.signup(
+                      await AccountApiService().signup(
                         emailController.text,
                         pwController.text,
                         nicknameController.text,
@@ -113,7 +113,7 @@ class SignupScreen extends StatelessWidget {
                     // 회원가입 성공 후 로그인 진행
                     try {
                       AuthenticateModel authentication =
-                          await ApiService.getAuthentication(
+                          await AccountApiService().getAuthentication(
                         email: emailController.text,
                         password: pwController.text,
                       );

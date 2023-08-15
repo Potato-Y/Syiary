@@ -12,7 +12,7 @@ import 'package:syiary_client/screens/group_in_screen/group_setting.dart';
 import 'package:syiary_client/screens/group_select_screen.dart';
 import 'package:syiary_client/screens/login_screen.dart';
 import 'package:syiary_client/screens/signup_screen.dart';
-import 'package:syiary_client/services/api_services.dart';
+import 'package:syiary_client/services/group/account_api_service.dart';
 import 'package:syiary_client/themes/app_original_color.dart';
 import 'package:syiary_client/widgets/logo_widget.dart';
 
@@ -141,7 +141,7 @@ class StartLoadScreen extends StatelessWidget {
 
     Future<UserModel?> load() async {
       try {
-        UserModel user = await ApiService.getMyUserInfo();
+        UserModel user = await AccountApiService().getMyUserInfo();
         return user;
       } catch (e) {
         debugPrint('_load error\n$e');

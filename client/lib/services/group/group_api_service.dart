@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:syiary_client/enum/request_method.dart';
+import 'package:syiary_client/exception/group_exception.dart';
 
 import '../../models/response/create_group_model.dart';
 import '../../models/response/group_info_model.dart';
@@ -24,7 +25,7 @@ class GroupApiService extends ApiBase {
       return group;
     }
 
-    throw Error();
+    throw GroupException('그룹 생성에 실패하였습니다.');
   }
 
   /// 그룹 목록을 가져온다.
@@ -42,7 +43,7 @@ class GroupApiService extends ApiBase {
       return groups;
     }
 
-    throw Error();
+    throw GroupException('그룹 목록을 불러오기에 실패하였습니다.');
   }
 
   /// 그룹 정보 불러오기
@@ -58,7 +59,7 @@ class GroupApiService extends ApiBase {
       return group;
     }
 
-    throw Error();
+    throw GroupException('그룹 정보를 가져오지 못하였습니다.');
   }
 
   /// 새로운 사용자를 추가한다.
@@ -72,10 +73,11 @@ class GroupApiService extends ApiBase {
     );
 
     if (response.statusCode != HttpStatus.noContent) {
-      throw Error();
+      throw GroupException('사용자 추가에 실패하였습니다.');
     }
   }
 
+  /// 그룹을 삭제한다.
   Future deleteGroup(String groupUri, String groupSign) async {
     var url = Uri.parse('$baseUrl/api/groups/$groupUri');
     var body = {"groupNameSign": groupSign};
@@ -83,7 +85,7 @@ class GroupApiService extends ApiBase {
         await requestRestApi(RequestMethod.delete, url, body: body);
 
     if (response.statusCode != HttpStatus.noContent) {
-      throw Error();
+      throw GroupException('그룹을 삭제하지 못하였습니다.');
     }
   }
 }

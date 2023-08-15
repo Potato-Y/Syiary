@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:syiary_client/models/providers/user_info.dart';
 import 'package:syiary_client/models/response/authenticate_model/authenticate_model.dart';
-import 'package:syiary_client/services/api_services.dart';
+import 'package:syiary_client/services/group/account_api_service.dart';
 import 'package:syiary_client/widgets/logo_widget.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -101,7 +101,7 @@ class LoginScreen extends StatelessWidget {
 
                     try {
                       AuthenticateModel authentication =
-                          await ApiService.getAuthentication(
+                          await AccountApiService().getAuthentication(
                         email: emailController.text,
                         password: pwController.text,
                       );

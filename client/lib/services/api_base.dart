@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:syiary_client/enum/request_method.dart';
+import 'package:syiary_client/exception/account_exception.dart';
+import 'package:syiary_client/exception/response_exception.dart';
 import 'package:syiary_client/models/response/token_reissue_model.dart';
 
 class ApiBase {
@@ -53,8 +54,7 @@ class ApiBase {
         box.delete('user_access_token');
         box.delete('user_refresh_token');
 
-        Fluttertoast.showToast(msg: '계정 정보를 불러올 수 없습니다.'); // TODO UI 영역으로 이동 필요
-        throw Error();
+        throw AccountException('계정 정보를 불러올 수 없습니다.');
       }
 
       // 변경된 토큰을 통해 재요청한다.
@@ -67,11 +67,11 @@ class ApiBase {
     }
 
     // 또 실패한 경우 예외 발생
-    throw Error();
+    throw ResponseException('요청에 실패하였습니다.');
   }
 
   /// form-data 방식의 요청을 한다.
-  Future requestForm(RequestMethod method, String url,
+  Future<Response> requestForm(RequestMethod method, String url,
       {Map<String, dynamic>? body}) async {
     final box = Hive.box('app');
 
@@ -91,7 +91,7 @@ class ApiBase {
         data = FormData.fromMap(body);
       }
 
-      var response = await dio.request(
+      Response response = await dio.request(
         url,
         options: Options(
           method: method.value,
@@ -117,8 +117,7 @@ class ApiBase {
         box.delete('user_access_token');
         box.delete('user_refresh_token');
 
-        Fluttertoast.showToast(msg: '계정 정보를 불러올 수 없습니다.'); // TODO UI 영역으로 이동 필요
-        throw Error();
+        throw AccountException('계정 정보를 불러올 수 없습니다.');
       }
 
       // 변경된 토큰을 통해 재요청한다.
@@ -131,7 +130,7 @@ class ApiBase {
     }
 
     // 또 실패한 경우 예외 발생
-    throw Error();
+    throw ResponseException('요청에 실패하였습니다.');
   }
 
   /// 새로운 토큰을 발급 받는다.
@@ -149,7 +148,7 @@ class ApiBase {
       return TokenReissueModel.fromJson(body);
     }
 
-    throw Error();
+    throw AccountException('계정 정보를 불러올 수 없습니다.');
   }
 
   Future<String> getResponseBody(http.StreamedResponse response) async {

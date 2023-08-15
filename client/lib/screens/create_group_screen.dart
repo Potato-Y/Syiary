@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:syiary_client/models/response/create_group_model.dart';
-import 'package:syiary_client/services/api_services.dart';
+import 'package:syiary_client/services/group/group_api_service.dart';
+
+import '../exception/account_exception.dart';
+import '../exception/group_exception.dart';
+import '../exception/response_exception.dart';
 
 class CreateGroupSelectScreen extends StatefulWidget {
   const CreateGroupSelectScreen({super.key});
@@ -70,13 +74,21 @@ class _CreateGroupSelectScreenState extends State<CreateGroupSelectScreen> {
                           });
 
                           try {
-                            CreateGroupModel group =
-                                await ApiService.createGroup(
-                                    _groupNameController.text);
+                            CreateGroupModel group = await GroupApiService()
+                                .createGroup(_groupNameController.text);
 
                             goGroupScreen(group.groupUri!);
+                          } on GroupException catch (e) {
+                            Fluttertoast.showToast(msg: e.message);
+                          } on AccountException catch (e) {
+                            Fluttertoast.showToast(msg: e.message);
+                            context.go('/login');
+                          } on ResponseException catch (e) {
+                            Fluttertoast.showToast(msg: e.message);
                           } catch (e) {
-                            Fluttertoast.showToast(msg: '그룹을 만드는데 실패하였습니다.');
+                            Fluttertoast.showToast(msg: '오류가 발생했습니다.');
+                            debugPrint(e.toString());
+                          } finally {
                             setState(() {
                               _loading = false;
                             });
