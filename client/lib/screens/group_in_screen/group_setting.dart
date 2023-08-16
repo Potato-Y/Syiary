@@ -291,7 +291,9 @@ class _DeleteGroupContainerState extends State<DeleteGroupContainer> {
                       await GroupApiService()
                           .leaveMember(widget.groupUri, null);
 
-                      context.go('/');
+                      if (context.mounted) {
+                        context.go('/');
+                      }
                     } on GroupException catch (e) {
                       Fluttertoast.showToast(msg: e.message);
                     } on AccountException catch (e) {
