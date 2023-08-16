@@ -107,9 +107,9 @@ class GroupApiService extends ApiBase {
   }
 
   /// 그룹에서 멤버를 내보낸다.
-  Future leaveMember(String groupUri, String email) async {
+  Future leaveMember(String groupUri, String? email) async {
     var url = Uri.parse('$baseUrl/api/groups/$groupUri/members');
-    var body = {"userEmail": email};
+    var body = {'userEmail': email ?? ''};
     final http.StreamedResponse response =
         await requestRestApi(RequestMethod.delete, url, body: body);
 

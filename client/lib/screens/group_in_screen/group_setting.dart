@@ -103,10 +103,6 @@ class GroupSetting extends StatelessWidget {
                 '그룹 삭제',
                 color: Colors.red,
               ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
-                child: Text('그룹 삭제를 위해서는 그룹 이름을 입력하세요'),
-              ),
               DeleteGroupContainer(groupUri: groupUri),
             ],
           ),
@@ -256,17 +252,47 @@ class _DeleteGroupContainerState extends State<DeleteGroupContainer> {
           // host가 아닌 경우 방 나가기 반환
           if (snapshot.data!.hostUser!.email !=
               context.read<UserInfo>().email) {
-            return FilledButton(
-              style: FilledButton.styleFrom(
-                backgroundColor: Colors.red[200],
-              ),
-              child: const Text(
-                '방 나가기',
-                style: TextStyle(
-                  color: Colors.black,
+            return Column(
+              children: [
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
+                      child: Text('그룹을 탈퇴합니다.'),
+                    ),
+                  ],
                 ),
-              ),
-              onPressed: () {},
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.red[200],
+                  ),
+                  child: const Text(
+                    '방 나가기',
+                    style: TextStyle(
+                      color: Colors.black,
+                    ),
+                  ),
+                  onPressed: () async {
+                    try {
+                      await GroupApiService()
+                          .leaveMember(widget.groupUri, null);
+
+                      context.go('/');
+                    } on GroupException catch (e) {
+                      Fluttertoast.showToast(msg: e.message);
+                    } on AccountException catch (e) {
+                      Fluttertoast.showToast(msg: e.message);
+                      context.go('/login');
+                    } on ResponseException catch (e) {
+                      Fluttertoast.showToast(msg: e.message);
+                    } catch (e) {
+                      debugPrint(e.toString());
+                      Fluttertoast.showToast(msg: '오류가 발생했습니다.');
+                    }
+                  },
+                ),
+              ],
             );
           }
 
@@ -274,6 +300,15 @@ class _DeleteGroupContainerState extends State<DeleteGroupContainer> {
 
           return Column(
             children: [
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
+                    child: Text('그룹 삭제를 위해서는 그룹 이름을 입력하세요.'),
+                  ),
+                ],
+              ),
               SizedBox(
                 height: itemHeight,
                 child: TextField(
@@ -294,7 +329,7 @@ class _DeleteGroupContainerState extends State<DeleteGroupContainer> {
                   backgroundColor: Colors.red[200],
                 ),
                 child: const Text(
-                  '삭제',
+                  '그룹 삭제',
                   style: TextStyle(
                     color: Colors.black,
                   ),
@@ -309,6 +344,7 @@ class _DeleteGroupContainerState extends State<DeleteGroupContainer> {
                     GroupApiService().deleteGroup(
                         widget.groupUri, _textEditingController.text);
 
+                    Fluttertoast.showToast(msg: '그룹을 완전히 삭제하는데 시간이 걸립니다.');
                     context.go('/');
                   } on GroupException catch (e) {
                     Fluttertoast.showToast(msg: e.message);
