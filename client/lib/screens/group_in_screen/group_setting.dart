@@ -14,17 +14,32 @@ import '../../exception/account_exception.dart';
 import '../../exception/response_exception.dart';
 import '../../models/response/group_info_model.dart';
 
-class GroupSetting extends StatelessWidget {
+class GroupSetting extends StatefulWidget {
   final String groupUri;
 
-  GroupSetting({super.key, required this.groupUri});
+  const GroupSetting({super.key, required this.groupUri});
 
+  @override
+  State<GroupSetting> createState() => _GroupSettingState();
+}
+
+class _GroupSettingState extends State<GroupSetting> {
   final _emailTextEditingController = TextEditingController();
+
+  late Future<GroupMembersModel> userModels;
+
+  void reloadGroupMembers() {
+    setState(() {
+      userModels = GroupApiService().getGroupMembers(widget.groupUri);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     // final double itemWidth = MediaQuery.of(context).size.width * 0.8;
     const double itemHeight = 50;
+
+    userModels = GroupApiService().getGroupMembers(widget.groupUri);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Group settings')),
@@ -64,10 +79,13 @@ class GroupSetting extends StatelessWidget {
                       }
 
                       try {
-                        await GroupApiService().signupMemberGroup(groupUri,
+                        await GroupApiService().signupMemberGroup(
+                            widget.groupUri,
                             email: _emailTextEditingController.text);
                         Fluttertoast.showToast(msg: '사용자를 추가하였습니다.');
                         _emailTextEditingController.text = '';
+
+                        reloadGroupMembers();
                       } on GroupException catch (e) {
                         Fluttertoast.showToast(msg: e.message);
                       } on AccountException catch (e) {
@@ -95,15 +113,16 @@ class GroupSetting extends StatelessWidget {
                     ),
                   ),
                   child: GroupMemberListWidget(
-                    groupUri: groupUri,
-                  ),
+                      groupUri: widget.groupUri,
+                      userModels: userModels,
+                      reloadGroupMembers: reloadGroupMembers),
                 ),
               ),
               const SettingTitle(
                 '그룹 삭제',
                 color: Colors.red,
               ),
-              DeleteGroupContainer(groupUri: groupUri),
+              DeleteGroupContainer(groupUri: widget.groupUri),
             ],
           ),
         ),
@@ -112,22 +131,19 @@ class GroupSetting extends StatelessWidget {
   }
 }
 
-class GroupMemberListWidget extends StatefulWidget {
+class GroupMemberListWidget extends StatelessWidget {
+  final Future<GroupMembersModel> userModels;
   final String groupUri;
+  final Function reloadGroupMembers;
 
-  const GroupMemberListWidget({super.key, required this.groupUri});
-
-  @override
-  State<GroupMemberListWidget> createState() => _GroupMemberListWidgetState();
-}
-
-class _GroupMemberListWidgetState extends State<GroupMemberListWidget> {
-  late Future<GroupMembersModel> userModels;
+  const GroupMemberListWidget(
+      {super.key,
+      required this.groupUri,
+      required this.userModels,
+      required this.reloadGroupMembers});
 
   @override
   Widget build(BuildContext context) {
-    userModels = GroupApiService().getGroupMembers(widget.groupUri);
-
     return FutureBuilder(
       future: userModels,
       builder: (context, snapshot) {
@@ -178,15 +194,12 @@ class _GroupMemberListWidgetState extends State<GroupMemberListWidget> {
                         child: const Text('내보내기'),
                         onPressed: () async {
                           try {
-                            await GroupApiService().leaveMember(
-                                widget.groupUri, users[index].email!);
+                            await GroupApiService()
+                                .leaveMember(groupUri, users[index].email!);
                           } catch (e) {
                             Fluttertoast.showToast(msg: '요청을 실패하였습니다.');
                           } finally {
-                            setState(() {
-                              userModels = GroupApiService()
-                                  .getGroupMembers(widget.groupUri);
-                            });
+                            reloadGroupMembers();
                           }
                         },
                       ),
