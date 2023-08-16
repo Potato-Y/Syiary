@@ -5,7 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:syiary_client/exception/group_exception.dart';
 import 'package:syiary_client/models/providers/user_info.dart';
+import 'package:syiary_client/models/response/authenticate_model/user_model.dart';
+import 'package:syiary_client/models/response/group_members/group_members_model.dart';
 import 'package:syiary_client/services/group/group_api_service.dart';
+import 'package:syiary_client/themes/app_original_color.dart';
 
 import '../../exception/account_exception.dart';
 import '../../exception/response_exception.dart';
@@ -32,7 +35,7 @@ class GroupSetting extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SettingTitle('사용자 추가'),
+              const SettingTitle('멤버 추가'),
               Row(
                 children: [
                   Expanded(
@@ -81,10 +84,20 @@ class GroupSetting extends StatelessWidget {
                   ),
                 ],
               ),
-              const SettingTitle('사용자 제거'),
-              const SizedBox(
+              const SettingTitle('멤버 목록'),
+              SizedBox(
                 height: 300,
-                child: Placeholder(),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black45),
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(10),
+                    ),
+                  ),
+                  child: GroupMemberListWidget(
+                    groupUri: groupUri,
+                  ),
+                ),
               ),
               const SettingTitle(
                 '그룹 삭제',
@@ -99,6 +112,104 @@ class GroupSetting extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class GroupMemberListWidget extends StatefulWidget {
+  final String groupUri;
+
+  const GroupMemberListWidget({super.key, required this.groupUri});
+
+  @override
+  State<GroupMemberListWidget> createState() => _GroupMemberListWidgetState();
+}
+
+class _GroupMemberListWidgetState extends State<GroupMemberListWidget> {
+  late Future<GroupMembersModel> userModels;
+
+  @override
+  Widget build(BuildContext context) {
+    userModels = GroupApiService().getGroupMembers(widget.groupUri);
+
+    return FutureBuilder(
+      future: userModels,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          List<UserModel> users = [];
+
+          users.add(snapshot.data!.hostUser!);
+          if (snapshot.data!.memberUser!.isNotEmpty) {
+            users.addAll(snapshot.data!.memberUser!);
+          }
+
+          return ListView.separated(
+            scrollDirection: Axis.vertical,
+            itemCount: users.length,
+            itemBuilder: (context, index) {
+              return Container(
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            users[index].nickname!,
+                            style: const TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                          Text(users[index].email!),
+                        ],
+                      ),
+                    ),
+                    if (index == 0)
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10)),
+                          color: appOriginalColor.shade50,
+                        ),
+                        child: const Text('Host'),
+                      ),
+                    if (snapshot.data!.hostUser!.email ==
+                            context.read<UserInfo>().email &&
+                        index > 0) // 호스트인 경우만 버튼을 보이기, 호스트는 내보내기 없애기
+                      TextButton(
+                        child: const Text('내보내기'),
+                        onPressed: () async {
+                          try {
+                            await GroupApiService().leaveMember(
+                                widget.groupUri, users[index].email!);
+                          } catch (e) {
+                            Fluttertoast.showToast(msg: '요청을 실패하였습니다.');
+                          } finally {
+                            setState(() {
+                              userModels = GroupApiService()
+                                  .getGroupMembers(widget.groupUri);
+                            });
+                          }
+                        },
+                      ),
+                  ],
+                ),
+              );
+            },
+            separatorBuilder: (context, index) => Container(
+              margin: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              height: 0.5,
+              color: Colors.black45,
+            ),
+          );
+        }
+
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
     );
   }
 }
