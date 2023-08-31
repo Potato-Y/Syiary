@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:syiary_client/exception/account_exception.dart';
 import 'package:syiary_client/exception/group_exception.dart';
 import 'package:syiary_client/models/response/group_info_model.dart';
+import 'package:syiary_client/screens/group_in_screen/group_feed_screen.dart';
 import 'package:syiary_client/services/group/group_api_service.dart';
 
 import '../../exception/response_exception.dart';
@@ -104,9 +105,7 @@ class _GroupBodyScreenState extends State<GroupBodyScreen> {
         onPageChanged: _onPageChanged,
         children: [
           // feed
-          Container(
-            child: const Text('feed container'),
-          ),
+          GroupFeedScreen(groupUri: widget.groupUri),
           // feed add
           AddPostScreen(
             groupUri: widget.groupUri,
