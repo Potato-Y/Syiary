@@ -11,6 +11,8 @@ import 'package:syiary_client/models/response/token_reissue_model.dart';
 
 class ApiBase {
   final String baseUrl = 'http://localhost:8080';
+  final String accessTokenDbKey = 'user_access_token';
+  final String refreshTokenDbKey = 'user_refresh_token';
 
   ApiBase();
 
@@ -20,8 +22,8 @@ class ApiBase {
       {Map<String, dynamic>? body}) async {
     final box = Hive.box('app');
 
-    String accessToken = box.get('user_access_token');
-    String refreshToken = box.get('user_refresh_token');
+    String accessToken = box.get(accessTokenDbKey);
+    String refreshToken = box.get(refreshTokenDbKey);
 
     Future<http.StreamedResponse> request() async {
       Map<String, String> headers = {

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
 import 'package:syiary_client/enum/request_method.dart';
 import 'package:syiary_client/exception/account_exception.dart';
@@ -28,6 +29,11 @@ class AccountApiService extends ApiBase {
     if (response.statusCode == HttpStatus.ok) {
       final dynamic body = jsonDecode(response.body);
       AuthenticateModel model = AuthenticateModel.fromJson(body);
+
+      // 로그인 정보를 db에 저장한다.
+      final box = Hive.box('app');
+      box.put(accessTokenDbKey, model.accessToken);
+      box.put(refreshTokenDbKey, model.refreshToken);
 
       return model;
     }

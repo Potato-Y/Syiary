@@ -1,7 +1,6 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:syiary_client/models/providers/user_info.dart';
@@ -105,15 +104,6 @@ class LoginScreen extends StatelessWidget {
                         email: emailController.text,
                         password: pwController.text,
                       );
-
-                      debugPrint('access: ${authentication.accessToken}');
-                      debugPrint('refresh: ${authentication.refreshToken}');
-                      debugPrint('nickname: ${authentication.user}');
-
-                      final box = Hive.box('app');
-                      box.put('user_access_token', authentication.accessToken);
-                      box.put(
-                          'user_refresh_token', authentication.refreshToken);
 
                       if (context.mounted) {
                         context.read<UserInfo>().setUserId =
