@@ -9,6 +9,7 @@ import 'package:syiary_client/models/response/authenticate_model/user_model.dart
 import 'package:syiary_client/models/response/group_members/group_members_model.dart';
 import 'package:syiary_client/services/group/group_api_service.dart';
 import 'package:syiary_client/themes/app_original_color.dart';
+import 'package:syiary_client/widgets/setting_title_widget.dart';
 
 import '../../exception/account_exception.dart';
 import '../../exception/response_exception.dart';
@@ -50,7 +51,7 @@ class _GroupSettingState extends State<GroupSetting> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SettingTitle('멤버 추가'),
+              const SettingTitleWidget('멤버 추가'),
               Row(
                 children: [
                   Expanded(
@@ -102,7 +103,7 @@ class _GroupSettingState extends State<GroupSetting> {
                   ),
                 ],
               ),
-              const SettingTitle('멤버 목록'),
+              const SettingTitleWidget('멤버 목록'),
               SizedBox(
                 height: 300,
                 child: Container(
@@ -118,7 +119,7 @@ class _GroupSettingState extends State<GroupSetting> {
                       reloadGroupMembers: reloadGroupMembers),
                 ),
               ),
-              const SettingTitle(
+              const SettingTitleWidget(
                 '그룹 삭제',
                 color: Colors.red,
               ),
@@ -380,28 +381,6 @@ class _DeleteGroupContainerState extends State<DeleteGroupContainer> {
 
         return const CircularProgressIndicator();
       },
-    );
-  }
-}
-
-class SettingTitle extends StatelessWidget {
-  final String text;
-  final Color? color;
-
-  const SettingTitle(this.text, {super.key, this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(5, 20, 0, 10),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: color,
-        ),
-      ),
     );
   }
 }
