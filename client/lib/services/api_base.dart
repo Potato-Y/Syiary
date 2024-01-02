@@ -53,8 +53,7 @@ class ApiBase {
         box.put('user_access_token', accessToken);
       } catch (e) {
         // 토큰을 갱신하지 못한 경우 관련 정보를 삭제한다.
-        box.delete('user_access_token');
-        box.delete('user_refresh_token');
+        clearToken(box);
 
         throw AccountException('계정 정보를 불러올 수 없습니다.');
       }
@@ -155,5 +154,11 @@ class ApiBase {
 
   Future<String> getResponseBody(http.StreamedResponse response) async {
     return await response.stream.bytesToString();
+  }
+
+  /// db에 저장된 토큰 정보를 삭제한다.
+  void clearToken(Box<dynamic> box) {
+    box.delete('user_access_token');
+    box.delete('user_refresh_token');
   }
 }
