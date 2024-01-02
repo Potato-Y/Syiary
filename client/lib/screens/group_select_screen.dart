@@ -62,6 +62,13 @@ class GroupSelectScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Syiary'),
+        actions: [
+          IconButton(
+            onPressed: () => context.push('/setting'),
+            tooltip: 'Setting',
+            icon: const Icon(Icons.settings),
+          ),
+        ],
       ),
       body: Center(
         child: SingleChildScrollView(

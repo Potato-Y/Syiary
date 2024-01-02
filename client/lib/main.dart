@@ -11,6 +11,7 @@ import 'package:syiary_client/screens/group_in_screen/group_screen.dart';
 import 'package:syiary_client/screens/group_in_screen/group_setting.dart';
 import 'package:syiary_client/screens/group_select_screen.dart';
 import 'package:syiary_client/screens/login_screen.dart';
+import 'package:syiary_client/screens/setting.dart';
 import 'package:syiary_client/screens/signup_screen.dart';
 import 'package:syiary_client/services/group/account_api_service.dart';
 import 'package:syiary_client/themes/app_original_color.dart';
@@ -77,6 +78,11 @@ class App extends StatelessWidget {
             path: '/signup',
             name: 'signup',
             builder: (context, state) => SignupScreen(),
+          ),
+          GoRoute(
+            path: '/setting',
+            name: 'setting',
+            builder: (context, state) => const SettingScreen(),
           ),
           GoRoute(
             path: '/groups',
